@@ -44,16 +44,123 @@ public final class VoicePower {
     /** files/ 下的持久化旗标：存在 ⇒ 省电模式（语音助手停用） */
     public static final String FLAG = "voice_off";
 
+    /** VN fork: persisted wakeup threshold (files/wake_thr, -17.0..-9.0, default -13.5). */
+    public static final String WAKE_THR_FILE = "wake_thr";
+    public static final float WAKE_THR_DEFAULT = -13.5f;
+    public static final float WAKE_THR_MIN = -17.0f;
+    public static final float WAKE_THR_MAX = -9.0f;
+
     private static volatile Context ctx;
     /** 原厂 ANTEngine 实例（由 SpeechManager.<init> 钩子送来） */
     private static volatile Object sEngine;
     private static volatile boolean sHaveEngine;
     private static volatile boolean sOff;
+    private static volatile float sWakeThr = WAKE_THR_DEFAULT;
     /** 最近一次动作的结果（web 上直接看） */
     private static volatile String sLast = "-";
     private static volatile long sChangedMs;
 
     private VoicePower() {
+    }
+
+    // ---------------- VN fork: Wakeup Threshold (ANTConfigPreference) ----------------
+
+    private static float clampWakeThr(float v) {
+        if (Float.isNaN(v) || Float.isInfinite(v)) {
+            return WAKE_THR_DEFAULT;
+        }
+        if (v < WAKE_THR_MIN) v = WAKE_THR_MIN;
+        if (v > WAKE_THR_MAX) v = WAKE_THR_MAX;
+        return Math.round(v * 10.0f) / 10.0f;
+    }
+
+    public static float getWakeThr() {
+        return sWakeThr;
+    }
+
+    /** Load persisted files/wake_thr (default -13.5) and apply immediately. */
+    public static void initWakeThr(Context c) {
+        if (c != null) {
+            ctx = c.getApplicationContext();
+        }
+        float v = WAKE_THR_DEFAULT;
+        try {
+            String raw = XzBootstrap.readLineFile(WAKE_THR_FILE);
+            if (raw != null && raw.length() > 0) {
+                v = Float.parseFloat(raw.trim());
+            }
+        } catch (Throwable t) {
+            Log.w(TAG, "initWakeThr read failed", t);
+        }
+        sWakeThr = clampWakeThr(v);
+        applyWakeThr("boot");
+    }
+
+    /** Persist new wakeup threshold and apply live without restart. */
+    public static float setWakeThr(float v) {
+        float c = clampWakeThr(v);
+        sWakeThr = c;
+        XzBootstrap.writeLineFile(WAKE_THR_FILE, String.valueOf(c));
+        applyWakeThr("web");
+        SessionLog.i("wake threshold set -> " + c);
+        return c;
+    }
+
+    /** Apply sWakeThr to ANTConfigPreference static fields (+ native engine option if available). */
+    public static void applyWakeThr(String why) {
+        float thr = sWakeThr;
+        float m1 = Math.max(-18.0f, Math.round((thr - 0.5f) * 10.0f) / 10.0f);
+        float m2 = Math.max(-18.0f, Math.round((thr - 1.0f) * 10.0f) / 10.0f);
+        float m3 = Math.max(-18.0f, Math.round((thr - 2.0f) * 10.0f) / 10.0f);
+        try {
+            Class<?> cls = Class.forName("com.unisound.vui.common.config.ANTConfigPreference");
+            setStaticFloat(cls, "wakeupBenchmark", thr);
+            setStaticFloat(cls, "wakeupBenchmarkForContinues", thr);
+            setStaticFloat(cls, "wakeupBenchmarkForMusicPlaying", m1);
+            setStaticFloat(cls, "wakeupBenchmarkForMusicPlayingTwo", m2);
+            setStaticFloat(cls, "wakeupBenchmarkForMusicPlayingThree", m3);
+            setStaticFloat(cls, "effectWakeupBenchmark", thr);
+            Log.i(TAG, "VoicePower.applyWakeThr(" + why + "): thr=" + thr
+                    + " music=[" + m1 + "," + m2 + "," + m3 + "]");
+        } catch (Throwable t) {
+            Log.w(TAG, "VoicePower.applyWakeThr(" + why + ") failed: " + t);
+        }
+        // Also ensure native engine option WAKEUP_OPT_THRESHOLD_VALUE (0xc4e) stays <= -18.0f
+        Object e = sEngine;
+        if (e != null) {
+            try {
+                Method mUnsafe = e.getClass().getMethod("unsafe");
+                Object u = mUnsafe.invoke(e);
+                if (u != null) {
+                    Method mOpt = u.getClass().getMethod("setASROption", int.class, Object.class);
+                    mOpt.invoke(u, Integer.valueOf(0xc4e), Float.valueOf(-18.0f));
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
+    private static void setStaticFloat(Class<?> cls, String name, float val) {
+        try {
+            Field f = cls.getDeclaredField(name);
+            f.setAccessible(true);
+            f.setFloat(null, val);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static void delayedApplyWakeThr(final long delayMs, final String why) {
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(delayMs);
+                } catch (Throwable ignored) {
+                }
+                applyWakeThr(why);
+            }
+        }, "vp-wt-" + why);
+        t.setDaemon(true);
+        t.start();
     }
 
     // ---------------- smali 钩子 ----------------
@@ -66,6 +173,8 @@ public final class VoicePower {
         sEngine = engine;
         sHaveEngine = true;
         Log.i(TAG, "VoicePower: engine captured -> " + engine.getClass().getName());
+        applyWakeThr("engine");
+        delayedApplyWakeThr(2000L, "engine2");
         if (sOff) {
             // 开机即省电：引擎刚交到手，等它初始化完再停（太早调 native 会空转）
             delayedApply(1500L, "boot");

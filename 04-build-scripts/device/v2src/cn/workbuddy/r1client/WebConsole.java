@@ -750,6 +750,7 @@ public final class WebConsole {
             a.put("autoDisconnect", SessionController.isAutoDisconnectOn(app));
             a.put("idleSec", SessionController.getIdleSec(app));
             a.put("ttsVol", TtsPlayer.getTtsVolPct());
+            a.put("wakeThr", Math.round(VoicePower.getWakeThr() * 10.0) / 10.0);
             a.put("musicPause", MusicResume.isTtsPause());   // v1.3.132：TTS 与音乐互斥
             a.put("myMusic", PlayerBridge.isMyMusic());      // v1.3.139：自定义音乐库开关
             // v1.3.168：灯光控制（氛围灯在 ambient 段，因为它活在 player 里）
@@ -930,6 +931,16 @@ public final class WebConsole {
                 XzBootstrap.writeLineFile("tts_vol", String.valueOf(tvv));
                 TtsPlayer.setTtsVolPct(tvv);
                 msg.append("ttsVol=").append(tvv).append("% ");
+            }
+            String wt = q.get("wakeThr");
+            if (wt != null) {
+                float wv = VoicePower.WAKE_THR_DEFAULT;
+                try {
+                    wv = Float.parseFloat(wt.trim());
+                } catch (Throwable ignored) {
+                }
+                float applied = VoicePower.setWakeThr(wv);
+                msg.append("wakeThr=").append(applied).append(" ");
             }
             String isec = q.get("idleSec");
             if (isec != null) {

@@ -448,10 +448,13 @@ public final class XzBootstrap {
             MusicResume.setTtsPause(new File(app.getFilesDir(), "music_pause_tts").exists());
             // P3: 自定义音乐库默认关闭（files/my_music_on 存在时才开启），避免默认下发 28 个中文 NAS 工具及请求 192.168.2.189
             PlayerBridge.setMyMusic(new File(app.getFilesDir(), "my_music_on").exists());
+            // VN fork: load persisted wakeup threshold (files/wake_thr, default -13.5)
+            VoicePower.initWakeThr(app);
             // v1.3.147：指示灯联动（原厂灯控反射装载）。touch files/lights_off 关掉。
             R1Lights.init(app);
             String cfg = "xz audio cfg: aec=" + AudioCapture.aecEnabled
                     + " gain=" + AudioCapture.uplinkGain
+                    + " wake_thr=" + VoicePower.getWakeThr()
                     + " tts_vol=" + TtsPlayer.getTtsVolPct() + "%"
                     + " auto_disconnect=" + SessionController.isAutoDisconnectOn(app)
                     + " idle_sec=" + SessionController.getIdleSec(app)

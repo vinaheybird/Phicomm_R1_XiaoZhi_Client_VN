@@ -714,6 +714,21 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
                  oninput="ttsVolLive(this.value)">
         </div>
       </div>
+      <div class="ttl" style="margin-top:10px">Độ nhạy đánh thức <span class="hint" id="lbWakeThr">-13.5 (Khuyên dùng VN)</span></div>
+      <div class="seg" id="segWakeThr">
+        <div data-v="-11.3" onclick="wakeThrPick(-11.3)">Gốc</div>
+        <div data-v="-12.5" onclick="wakeThrPick(-12.5)">Vừa</div>
+        <div data-v="-13.5" onclick="wakeThrPick(-13.5)">VN</div>
+        <div data-v="-15" onclick="wakeThrPick(-15)">Rất nhạy</div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <div><div class="lb">Tinh chỉnh ngưỡng (Chặt ⇄ Nhạy)</div>
+          <div class="ds">Áp dụng ngay không cần khởi động lại loa. Kéo sang phải dễ gọi «Tiểu Trí Tiểu Trí» hơn (quá nhạy dễ nhận nhầm từ TV/nhạc)</div></div>
+        <div style="width:140px;flex:none">
+          <input type="range" id="rgWakeThr" min="9" max="17" step="0.5" value="13.5"
+                 oninput="wakeThrLive(this.value)">
+        </div>
+      </div>
       <div class="row">
         <div><div class="lb">Bỏ âm thanh từ đánh thức</div><div class="ds">Không gửi đoạn âm thanh đánh thức lên máy chủ</div></div>
         <div class="sw" id="swDw" onclick="tg('swDw','dropWake')"></div>
@@ -3880,6 +3895,7 @@ function MOCK_STATUS() {
     activation: { code: "A1B2-C3D4", deviceId: "Phicomm_R1_CD6B", clientId: "8f2c…", otaUrl: "", token: "ab12…(32)" },
     audio: { gain: 16, alc: false, aec: false, uscTap: true, dropWake: true,
              log: true, sound: true, autoDisconnect: false, musicPause: false, myMusic: true,
+             ttsVol: 50, wakeThr: -13.5,
              wakeLight: true, busyLight: true, listenLight: true },
     ambient: { ready: true, on: 1, mode: 2, luma: 100, chroma: 4,
                color: 6737151, modeName: "七彩", colorHex: "#66CCFF" },
@@ -4553,6 +4569,10 @@ function load() {
       var lbT = $("lbTtsVol");
       if (lbT) lbT.textContent = a.ttsVol + "%";
     }
+    // VN fork: Wakeup threshold slider + preset sync
+    if (a.wakeThr != null && !WAKE_UI) {
+      paintWakeThr(a.wakeThr);
+    }
     // P1: Idle auto-disconnect seconds sync
     if (a.idleSec != null && document.activeElement !== $("inIdleSec")) {
       var inI = $("inIdleSec");
@@ -4819,6 +4839,60 @@ function ttsVolLive(val) {
     });
     setTimeout(function () { TTS_UI = false; }, 1200);
   }, 180);
+}
+
+/* VN fork: Độ nhạy đánh thức (-9.0 chặt .. -17.0 rất nhạy; slider đảo chiều 9..17 để kéo phải = nhạy hơn) */
+var WAKE_UI = false, WAKE_T = null;
+function wakeThrLabel(thr) {
+  var v = Math.round(thr * 10) / 10;
+  var tag = (v >= -10.5) ? "Chặt"
+    : (v >= -11.8) ? "Gốc"
+    : (v >= -13.0) ? "Vừa"
+    : (v >= -14.2) ? "Khuyên dùng VN"
+    : (v >= -15.5) ? "Rất nhạy" : "Cực nhạy";
+  return v.toFixed(1) + " (" + tag + ")";
+}
+function paintWakeThr(thr) {
+  var v = Math.round(thr * 10) / 10;
+  if (v > -9) v = -9;
+  if (v < -17) v = -17;
+  var lb = $("lbWakeThr");
+  if (lb) lb.textContent = wakeThrLabel(v);
+  var rg = $("rgWakeThr");
+  if (rg) rg.value = (-v);
+  var sg = $("segWakeThr");
+  if (sg) {
+    var ch = sg.children;
+    for (var i = 0; i < ch.length; i++) {
+      var dv = parseFloat(ch[i].getAttribute("data-v"));
+      ch[i].className = (Math.abs(dv - v) < 0.06) ? "on" : "";
+    }
+  }
+}
+function sendWakeThr(thr) {
+  var v = Math.round(thr * 10) / 10;
+  if (v > -9) v = -9;
+  if (v < -17) v = -17;
+  WAKE_UI = true;
+  paintWakeThr(v);
+  if (WAKE_T) clearTimeout(WAKE_T);
+  WAKE_T = setTimeout(function () {
+    WAKE_T = null;
+    post("/api/set", "wakeThr=" + v).then(function () {
+      toast("Độ nhạy đánh thức: " + wakeThrLabel(v));
+    }).catch(function () {
+      toast("Lưu độ nhạy đánh thức thất bại");
+    });
+    setTimeout(function () { WAKE_UI = false; }, 1200);
+  }, 180);
+}
+function wakeThrLive(sliderVal) {
+  var s = parseFloat(sliderVal);
+  if (isNaN(s)) s = 13.5;
+  sendWakeThr(-s);
+}
+function wakeThrPick(thr) {
+  sendWakeThr(thr);
 }
 
 /* P1: Thời gian chờ tự ngắt khi rảnh (5..600s) */

@@ -14,6 +14,7 @@
 04-build-scripts/device/v22_merged.dex
 04-build-scripts/device/v22sources.txt
 04-build-scripts/device/_stale/
+04-build-scripts/device/_old_v24_*/
 04-build-scripts/device/release/
 04-build-scripts/device/__pycache__/
 04-build-scripts/device/ui/_preview.html

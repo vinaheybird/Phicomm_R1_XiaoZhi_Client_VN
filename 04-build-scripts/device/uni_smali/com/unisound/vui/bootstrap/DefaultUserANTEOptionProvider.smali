@@ -122,7 +122,8 @@
 
     sget-object v1, Lcom/unisound/vui/engine/ANTEngineOption;->WAKEUP_OPT_THRESHOLD_VALUE:Lcom/unisound/vui/engine/ANTEngineOption;
 
-    sget v2, Lcom/unisound/vui/common/config/ANTConfigPreference;->wakeupBenchmarkForMusicPlayingThree:F
+    # VN fork: unlock native KWS floor to -18.0f so live Web Console wakeup threshold works immediately across -9.0..-17.0
+    const v2, -0x3e700000    # -18.0f
 
     invoke-static {v2}, Ljava/lang/Float;->valueOf(F)Ljava/lang/Float;
 
