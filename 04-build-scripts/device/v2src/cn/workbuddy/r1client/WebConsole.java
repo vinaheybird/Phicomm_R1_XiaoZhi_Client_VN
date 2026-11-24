@@ -91,6 +91,10 @@ public final class WebConsole {
 
     private static Context app;
     private static int port = DEFAULT_PORT;
+
+    public static int getPort() {
+        return port;
+    }
     /**
      * v1.3.165：镜像端口（= 小飞页面的老端口 8080）。
      * v1.3.167：**默认 0（关）** —— 8080 已经归 player 侧控制台了（那里才是常驻页面），
@@ -268,6 +272,7 @@ public final class WebConsole {
 
             // 头
             int contentLen = 0;
+            String rangeHeader = null;
             while (true) {
                 String h = readLine(in);
                 if (h == null || h.length() == 0) {
@@ -279,6 +284,8 @@ public final class WebConsole {
                         contentLen = Integer.parseInt(h.substring(15).trim());
                     } catch (Throwable ignored) {
                     }
+                } else if (lh.startsWith("range:")) {
+                    rangeHeader = h.substring(6).trim();
                 }
             }
             String body = "";
@@ -304,6 +311,15 @@ public final class WebConsole {
             }
             if (body.length() > 0) {
                 parseQuery(body, q);
+            }
+
+            if (target.equals("/yt/stream")) {
+                try {
+                    sock.setSoTimeout(30000);
+                } catch (Throwable ignored) {
+                }
+                YoutubeMusic.handleStream(method, q.get("v"), rangeHeader, out);
+                return;
             }
 
             route(method, target, q, out);

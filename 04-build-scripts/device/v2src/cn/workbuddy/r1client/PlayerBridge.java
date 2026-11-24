@@ -203,6 +203,12 @@ public final class PlayerBridge {
 
     private static Context app;
     private static String indexUrl = DEFAULT_INDEX_URL;
+    /** True only when user configured a non-default files/music_index (NAS). */
+    private static volatile boolean customIndexConfigured = false;
+
+    public static boolean hasCustomIndex() {
+        return customIndexConfigured;
+    }
     /**
      * v1.3.102：多源索引。files/music_index 从「一行 URL」升级为「每行一个 URL」，
      * 逐个拉取后**合并成一个虚拟曲库**（NAS 本地 + 公网源同时可用）。
@@ -1856,7 +1862,8 @@ public final class PlayerBridge {
         } catch (Throwable t) {
             Log.w(TAG, "music_index flag read: " + t);
         }
-        final boolean shouldLoadIndex = myMusic || hasCustomIndex;
+        customIndexConfigured = hasCustomIndex && !DEFAULT_INDEX_URL.equals(indexUrl);
+        final boolean shouldLoadIndex = customIndexConfigured;
         Log.i(TAG, "player bridge init, index=" + indexUrl);
         SessionLog.i("player bridge ready, index=" + indexUrl);
         // v1.3.90 调试开关：files/dbg_play 里写一个曲名，进程启动后自动播一次。
@@ -2415,6 +2422,7 @@ public final class PlayerBridge {
             url = DEFAULT_INDEX_URL;
         }
         setIndexSpec(url);
+        customIndexConfigured = !DEFAULT_INDEX_URL.equals(indexUrl);
         try {
             File f = new File(app.getFilesDir(), "music_index");
             java.io.FileOutputStream fos = new java.io.FileOutputStream(f, false);
@@ -2680,16 +2688,23 @@ public final class PlayerBridge {
             if (q == null || q.trim().length() == 0) {
                 return null;
             }
+            if (!customIndexConfigured) {
+                return YoutubeMusic.searchJson(q, lim > 0 ? lim : 15);
+            }
             String b = nasBase();
             if (b == null) {
-                return null;
+                return YoutubeMusic.searchJson(q, lim > 0 ? lim : 15);
             }
             // v1.3.176：8s 对「歌手名」这类多源聚合不够（kw/wy/kg 都要跑一遍），
             //   结果就变成点了在线搜歌却返回空 ⇒ 提到 15s。网页侧反代给了 25s。
-            String js = httpGet(b + "/api/search?q=" + URLEncoder.encode(q.trim(), "UTF-8")
-                    + "&n=" + (lim > 0 ? lim : 10) + "&source=all", 15000);
+            String js = null;
+            try {
+                js = httpGet(b + "/api/search?q=" + URLEncoder.encode(q.trim(), "UTF-8")
+                        + "&n=" + (lim > 0 ? lim : 10) + "&source=all", 15000);
+            } catch (Throwable ignored) {
+            }
             if (js == null || js.length() == 0) {
-                return null;
+                return YoutubeMusic.searchJson(q, lim > 0 ? lim : 15);
             }
             JSONObject src = new JSONObject(js);
             JSONArray list = src.optJSONArray("list");
@@ -2745,6 +2760,9 @@ public final class PlayerBridge {
     private static String onlineUrl(String title, String artist, String source, String rid,
                                     int ms) {
         try {
+            if ("yt".equals(source) && YoutubeMusic.isValidVideoId(rid)) {
+                return YoutubeMusic.localStreamUrl(rid);
+            }
             String b = nasBase();
             if (b == null || source == null || source.length() == 0
                     || rid == null || rid.length() == 0) {
@@ -2782,6 +2800,43 @@ public final class PlayerBridge {
                                         String album, String duration, int urlMs) {
         try {
             if ((title == null || title.length() == 0) && (rid == null || rid.length() == 0)) {
+                return null;
+            }
+            if ("yt".equals(source) && YoutubeMusic.isValidVideoId(rid)) {
+                YoutubeMusic.StreamInfo si = YoutubeMusic.resolveStream(rid, false);
+                if (si == null) {
+                    return null;
+                }
+                String url = YoutubeMusic.localStreamUrl(rid);
+                String pic = YoutubeMusic.thumbUrl(rid);
+                String t = (title != null && title.length() > 0) ? title : rid;
+                String ar = (artist != null) ? artist : "";
+                String al = (album != null && album.length() > 0) ? album : "YouTube";
+                String du = (duration != null) ? duration : "";
+                String who = ar.length() > 0 ? (t + " - " + ar) : t;
+                String[] item = new String[]{t, ar, "", url, al, du, pic, "online"};
+                int idx;
+                synchronized (tracks) {
+                    tracks.add(item);
+                    idx = tracks.size() - 1;
+                }
+                List<Integer> one = new ArrayList<Integer>();
+                one.add(Integer.valueOf(idx));
+                int n = pushSongs("play_yt", one);
+                SessionLog.i("play yt item: 「" + who + "」 " + url + " push=" + n);
+                if (n > 0) {
+                    pushed = true;
+                    kickPlay("play_yt", startDelay(n), 2);
+                    notePlayingFull(who, al, du, "online");
+                    curPic = pic;
+                    return "OK Đang phát " + who + " (YouTube)";
+                }
+                String r = setUri(url);
+                if (r.startsWith("OK")) {
+                    notePlayingFull(who, al, du, "online");
+                    curPic = pic;
+                    return "OK Đang phát " + who + " (YouTube)";
+                }
                 return null;
             }
             String b = nasBase();
@@ -2866,14 +2921,68 @@ public final class PlayerBridge {
      * 只是不确定准不准」的情形，在线是加分项而不是必经之路 —— NAS 慢了就立刻
      * 回落本地，别让用户在音箱前干等十几秒。</p>
      */
+    /** Direct YouTube search + queue playback (plays best match first, queues up to 10 related). */
+    private static String playYoutubeSong(String q) {
+        try {
+            List<String[]> list = YoutubeMusic.searchTracks(q, 10);
+            if (list == null || list.isEmpty()) {
+                return null;
+            }
+            // Pick first playable video (verify resolveStream so we never push a dead/DRM video first).
+            int good = -1;
+            for (int i = 0; i < Math.min(list.size(), 3); i++) {
+                String u = list.get(i)[3];
+                int vi = u.indexOf("v=");
+                String vid = vi >= 0 ? u.substring(vi + 2) : "";
+                if (YoutubeMusic.resolveStream(vid, false) != null) {
+                    good = i;
+                    break;
+                }
+            }
+            if (good < 0) {
+                return null;
+            }
+            if (good > 0) {
+                String[] chosen = list.remove(good);
+                list.add(0, chosen);
+            }
+            List<Integer> idxs = appendOnlineTracks(list);
+            if (idxs.isEmpty()) {
+                return null;
+            }
+            int n = pushSongs("play_yt_song", idxs);
+            String[] e0 = list.get(0);
+            String who = (e0[1] != null && e0[1].length() > 0)
+                    ? (e0[0] + " - " + e0[1]) : e0[0];
+            if (n > 0) {
+                pushed = true;
+                kickPlay("play_yt_song", startDelay(n), 2);
+                notePlayingTrack(idxs.get(0).intValue());
+                return "OK Đang phát " + who + " (YouTube, đã xếp " + n + " bài)";
+            }
+            String r = setUri(e0[3]);
+            if (r.startsWith("OK")) {
+                notePlayingTrack(idxs.get(0).intValue());
+                return "OK Đang phát " + who + " (YouTube)";
+            }
+            return null;
+        } catch (Throwable t) {
+            SessionLog.i("playYoutubeSong 「" + q + "」 failed: " + t);
+            return null;
+        }
+    }
+
     public static String playOnlineSong(String q, int searchMs, int urlMs) {
         try {
             if (q == null || q.trim().length() == 0) {
                 return null;
             }
+            if (!customIndexConfigured) {
+                return playYoutubeSong(q.trim());
+            }
             String b = nasBase();
             if (b == null) {
-                return null;
+                return playYoutubeSong(q.trim());
             }
             // ★ v1.3.269：先按曲名打分挑（searchPick/osScore；语音不带独立歌手字段
             //   ⇒ artist 传空，闸门全放行、只看曲名贴合度）。热度第 1 条常常是
@@ -2913,11 +3022,12 @@ public final class PlayerBridge {
             }
             // ② 拿链 + ③ 塞 tracks + 推播（与库内歌同一条路，队列可见、能上下曲）
             // v1.3.175：album/duration 一起带（实际歌曲信息）
-            return playOnlineItem(title, artist, source, rid,
+            String r = playOnlineItem(title, artist, source, rid,
                     s0.optString("album", ""), s0.optString("duration", ""), urlMs);
+            return r != null ? r : playYoutubeSong(q.trim());
         } catch (Throwable t) {
             SessionLog.i("play online 「" + q + "」 failed: " + t);
-            return null;
+            return playYoutubeSong(q.trim());
         }
     }
 
@@ -2994,9 +3104,12 @@ public final class PlayerBridge {
      */
     private static List<String[]> fetchOnlinePool(int n, boolean fresh) {
         try {
+            if (!customIndexConfigured) {
+                return YoutubeMusic.randomTracks(n > 0 ? Math.min(n, 20) : 15);
+            }
             String b = nasBase();
             if (b == null) {
-                return null;
+                return YoutubeMusic.randomTracks(n > 0 ? Math.min(n, 20) : 15);
             }
             int want = n > 0 ? n : 100;
             // 多拉一些再自己抽：mini-lx 的 n 上限 300，池容量 400
@@ -3071,7 +3184,7 @@ public final class PlayerBridge {
             return out;
         } catch (Throwable t) {
             SessionLog.i("online pool fetch failed: " + t);
-            return null;
+            return YoutubeMusic.randomTracks(n > 0 ? Math.min(n, 20) : 15);
         }
     }
 
@@ -3627,9 +3740,15 @@ public final class PlayerBridge {
      */
     private static List<String[]> onlineTracksFor(String q, int max, int searchMs, long budgetMs) {
         try {
-            String b = nasBase();
-            if (b == null || q == null || q.trim().length() == 0) {
+            if (q == null || q.trim().length() == 0) {
                 return null;
+            }
+            if (!customIndexConfigured) {
+                return YoutubeMusic.searchTracks(q.trim(), max > 0 ? Math.min(max, 20) : 15);
+            }
+            String b = nasBase();
+            if (b == null) {
+                return YoutubeMusic.searchTracks(q.trim(), max > 0 ? Math.min(max, 20) : 15);
             }
             int lim = max > 0 ? max : 10;
             String js = httpGet(b + "/api/search?q=" + URLEncoder.encode(q.trim(), "UTF-8")
@@ -3669,7 +3788,7 @@ public final class PlayerBridge {
             return resolveOnlineUrls(b, cand.subList(0, cap), LEGACY_URL_CONC, 9000, budgetMs);
         } catch (Throwable t) {
             SessionLog.i("online tracks for 「" + q + "」 failed: " + t);
-            return null;
+            return YoutubeMusic.searchTracks(q.trim(), max > 0 ? Math.min(max, 20) : 15);
         }
     }
 
@@ -4440,10 +4559,15 @@ public final class PlayerBridge {
     public static JSONObject searchJson(String q, int lim, boolean shuffle) {
         JSONObject o = new JSONObject();
         try {
-            if (!idxLoaded) {
+            if (!idxLoaded && customIndexConfigured) {
                 loadIndex();
             }
             if (!idxLoaded) {
+                if (!customIndexConfigured) {
+                    o.put("total", 0);
+                    o.put("list", new JSONArray());
+                    return o;
+                }
                 o.put("err", "音乐库不可用: " + idxErr);
                 return o;
             }
@@ -7448,16 +7572,27 @@ public final class PlayerBridge {
                 return "OK 音量设为 " + lv + "（DLNA 兜底）";
             }
             if ("random".equals(op)) {
-                if (!idxLoaded) {
+                int cnt = args == null ? 0 : args.optInt("count", 0);
+                if (!idxLoaded && customIndexConfigured) {
                     loadIndex();
                 }
                 if (!idxLoaded) {
-                    return "ERR 音乐库不可用: " + idxErr;
+                    List<String[]> yt = YoutubeMusic.randomTracks(cnt > 0 ? Math.min(cnt, 20) : 15);
+                    if (yt != null && !yt.isEmpty()) {
+                        List<Integer> oi = appendOnlineTracks(yt);
+                        int nYt = pushSongs("random->yt", oi);
+                        if (nYt > 0) {
+                            pushed = true;
+                            kickPlay("random->yt", startDelay(nYt), 2);
+                            notePlayingTrack(oi.get(0).intValue());
+                            return "OK Đang phát ngẫu nhiên " + nYt + " bài từ YouTube";
+                        }
+                    }
+                    return "ERR Không tìm được nhạc trên YouTube";
                 }
                 // v1.3.114：支持 count（「随机放 5 首」）。之前 random 没有数量参数，
                 // 模型想放 5 首只能调 random 拿全库，再用 4 次 next 去「凑数」——
                 // 那样既不限制列表长度，又会把正在播的歌切掉。
-                int cnt = args == null ? 0 : args.optInt("count", 0);
                 int n = pushSongs("random", randomIdx(cnt));
                 if (n > 0) {
                     pushed = true;
@@ -7486,7 +7621,7 @@ public final class PlayerBridge {
                 if (cnt > maxPlaylist()) {
                     cnt = maxPlaylist();
                 }
-                if (!idxLoaded) {
+                if (!idxLoaded && customIndexConfigured) {
                     loadIndex();
                 }
                 List<String[]> pool = refreshRandPool(cnt);
@@ -7568,10 +7703,7 @@ public final class PlayerBridge {
                 if (items == null || items.length() == 0) {
                     return "ERR 没有可载入的在线结果";
                 }
-                String b = nasBase();
-                if (b == null) {
-                    return "ERR 音乐源没配（在线歌拿不到地址）";
-                }
+                String b = customIndexConfigured ? nasBase() : null;
                 int cap = maxPlaylist();
                 // 与 play_rand_at 同构：本地段原样保留，在线段整批接在后面
                 List<String[]> keep = localTracksSnapshot();
@@ -7592,17 +7724,28 @@ public final class PlayerBridge {
                             continue;
                         }
                         String url = "";
-                        if (pick.size() == 0) {
-                            // 第一首：正式取链，取不到再退惰性（马上要出声的那首）
-                            url = onlineUrl(title, artist, source, rid, 8000);
+                        String pic = it.optString("pic", "");
+                        if ("yt".equals(source) && YoutubeMusic.isValidVideoId(rid)) {
+                            url = YoutubeMusic.localStreamUrl(rid);
+                            if (pic.length() == 0) {
+                                pic = YoutubeMusic.thumbUrl(rid);
+                            }
+                        } else if (b != null) {
+                            if (pick.size() == 0) {
+                                // 第一首：正式取链，取不到再退惰性（马上要出声的那首）
+                                url = onlineUrl(title, artist, source, rid, 8000);
+                            }
+                            if (url.length() == 0) {
+                                url = b + "/r/" + source + "/" + rid
+                                        + "?title=" + enc(title) + "&artist=" + enc(artist);
+                            }
                         }
                         if (url.length() == 0) {
-                            url = b + "/r/" + source + "/" + rid
-                                    + "?title=" + enc(title) + "&artist=" + enc(artist);
+                            continue;
                         }
                         tracks.add(new String[]{title, artist, "", url,
                                 it.optString("album", ""), it.optString("duration", ""),
-                                "", "online"});
+                                pic, "online"});
                         pick.add(Integer.valueOf(tracks.size() - 1));
                     }
                 }
@@ -7777,11 +7920,28 @@ public final class PlayerBridge {
             // 找不到 / 压根没记录 ⇒ 退化成 random（保证「点了 ▶ 一定有声音」）。
             if ("replay".equals(op)) {
                 String q = (curTitle == null) ? "" : curTitle.trim();
-                if (!idxLoaded) {
+                if (!idxLoaded && customIndexConfigured) {
                     loadIndex();
                 }
                 if (!idxLoaded) {
-                    return "ERR 音乐库不可用: " + idxErr;
+                    if (q.length() > 0) {
+                        String on = playOnlineSong(q);
+                        if (on != null) {
+                            return on;
+                        }
+                    }
+                    List<String[]> yt = YoutubeMusic.randomTracks(15);
+                    if (yt != null && !yt.isEmpty()) {
+                        List<Integer> oi = appendOnlineTracks(yt);
+                        int nYt = pushSongs("replay->yt", oi);
+                        if (nYt > 0) {
+                            pushed = true;
+                            kickPlay("replay->yt", startDelay(nYt), 2);
+                            notePlayingTrack(oi.get(0).intValue());
+                            return "OK Đang phát ngẫu nhiên " + nYt + " bài từ YouTube";
+                        }
+                    }
+                    return "ERR Không tìm được nhạc trên YouTube";
                 }
                 if (q.length() > 0) {
                     List<Integer> hits = matchTracks(q, false);
@@ -7839,11 +7999,15 @@ public final class PlayerBridge {
                     return "ERR 《" + q.trim() + "》没搜到可信的版本（同名/翻唱都不可信）"
                             + "—— 可在收藏列表长按歌名手动 🔗 绑定正确的源";
                 }
-                if (!idxLoaded) {
+                if (!idxLoaded && customIndexConfigured) {
                     loadIndex();
                 }
                 if (!idxLoaded) {
-                    return "ERR 音乐库不可用: " + idxErr;
+                    String on = playOnlineSong(q);
+                    if (on != null) {
+                        return on;
+                    }
+                    return "ERR Không tìm thấy bài hát 「" + q + "」 trên YouTube";
                 }
                 // v1.3.260：语音点歌若这首歌已在当前播放队列里，直接跳过去播，不重建队列
                 // （用户说「播放 XX」通常就是想接上现有的列表，而不是清掉重来只留那一首）。
@@ -7944,11 +8108,36 @@ public final class PlayerBridge {
                 if (cnt > maxPlaylist()) {
                     cnt = maxPlaylist();
                 }
-                if (!idxLoaded) {
+                if (!idxLoaded && customIndexConfigured) {
                     loadIndex();
                 }
                 if (!idxLoaded) {
-                    return "ERR 音乐库不可用: " + idxErr;
+                    if (q.length() == 0) {
+                        List<String[]> yt0 = YoutubeMusic.randomTracks(cnt > 0 ? Math.min(cnt, 20) : 15);
+                        if (yt0 != null && !yt0.isEmpty()) {
+                            List<Integer> oi0 = appendOnlineTracks(yt0);
+                            int n0 = pushSongs("play_artist->yt_random", oi0);
+                            if (n0 > 0) {
+                                pushed = true;
+                                kickPlay("play_artist->yt_random", startDelay(n0), 2);
+                                notePlayingTrack(oi0.get(0).intValue());
+                                return "OK Đang phát ngẫu nhiên " + n0 + " bài từ YouTube";
+                            }
+                        }
+                        return "ERR Không tìm được nhạc trên YouTube";
+                    }
+                    List<String[]> on0 = onlineTracksFor(q, cnt > 0 ? Math.min(cnt, 20) : 15, 8000, 8000);
+                    if (on0 != null && !on0.isEmpty()) {
+                        List<Integer> oi = appendOnlineTracks(on0);
+                        int n = pushSongs("play_artist->yt", oi);
+                        if (n > 0) {
+                            pushed = true;
+                            kickPlay("play_artist->yt", startDelay(n), 2);
+                            notePlayingTrack(oi.get(0).intValue());
+                            return "OK Đang phát " + n + " bài của 「" + q + "」 từ YouTube";
+                        }
+                    }
+                    return "ERR Không tìm thấy nhạc của 「" + q + "」 trên YouTube";
                 }
                 // v1.3.114：没给歌手时不要报错 —— 模型经常把「随机放 5 首」派给
                 // play_artist 却填不出 artist。这时退化成 random(count)。
@@ -8055,11 +8244,11 @@ public final class PlayerBridge {
                ids = 曲库序号（1 起，与 play_index / search 输出的编号一致），逗号分隔；
                留空 = 整个曲库。两种都受「播放列表上限」约束（maxPlaylist）。 */
             if ("queue_all".equals(op)) {
-                if (!idxLoaded) {
+                if (!idxLoaded && customIndexConfigured) {
                     loadIndex();
                 }
-                if (!idxLoaded) {
-                    return "ERR 音乐库不可用: " + idxErr;
+                if (!idxLoaded && tracks.isEmpty()) {
+                    return "ERR Chưa có kho nhạc nội bộ";
                 }
                 String ids = args == null ? "" : args.optString("ids", "");
                 int lim = args == null ? 0 : args.optInt("limit", 0);
@@ -8106,11 +8295,11 @@ public final class PlayerBridge {
 
             // v1.3.112：按序号播放（「放第 8 首」）。序号与 search/list 输出的编号一致（1 起）。
             if ("play_index".equals(op)) {
-                if (!idxLoaded) {
+                if (!idxLoaded && customIndexConfigured) {
                     loadIndex();
                 }
-                if (!idxLoaded) {
-                    return "ERR 音乐库不可用: " + idxErr;
+                if (!idxLoaded && tracks.isEmpty()) {
+                    return "ERR Chưa có kho nhạc nội bộ";
                 }
                 int n = args == null ? 0 : args.optInt("index", 0);
                 if (n <= 0) {
@@ -8183,15 +8372,29 @@ public final class PlayerBridge {
 
             // v1.3.112：只查不播，返回带序号的候选列表。模型要「放第几首」必须先有这个。
             if ("search".equals(op)) {
-                if (!idxLoaded) {
-                    loadIndex();
-                }
-                if (!idxLoaded) {
-                    return "ERR 音乐库不可用: " + idxErr;
-                }
                 String q = args == null ? "" : args.optString("keyword", "");
                 if (q.length() == 0) {
                     q = args == null ? "" : args.optString("title", "");
+                }
+                if (!idxLoaded && customIndexConfigured) {
+                    loadIndex();
+                }
+                if (!idxLoaded) {
+                    JSONObject yt = YoutubeMusic.searchJson(q, 10);
+                    JSONArray arr = yt == null ? null : yt.optJSONArray("list");
+                    if (arr == null || arr.length() == 0) {
+                        return "ERR Không tìm thấy kết quả trên YouTube cho 「" + q + "」";
+                    }
+                    StringBuilder sb = new StringBuilder("OK YouTube tìm thấy " + arr.length() + " bài:\n");
+                    for (int i = 0; i < arr.length(); i++) {
+                        JSONObject it = arr.optJSONObject(i);
+                        if (it != null) {
+                            sb.append(i + 1).append(". ").append(it.optString("title", ""))
+                              .append(" - ").append(it.optString("artist", ""))
+                              .append(" (").append(it.optString("duration", "")).append(")\n");
+                        }
+                    }
+                    return sb.toString().trim();
                 }
                 if (q.length() == 0) {
                     q = args == null ? "" : args.optString("artist", "");
@@ -8236,11 +8439,11 @@ public final class PlayerBridge {
             }
 
             if ("list".equals(op)) {
-                if (!idxLoaded) {
+                if (!idxLoaded && customIndexConfigured) {
                     loadIndex();
                 }
                 if (!idxLoaded) {
-                    return "ERR 音乐库不可用: " + idxErr;
+                    return "OK Đang dùng chế độ tìm và phát nhạc trực tiếp từ YouTube (không cần NAS). Dùng play_song / play_artist / random để phát nhạc.";
                 }
                 // v1.3.112：1185 首的库列 60 首歌名没意义（顺序固定、永远同一批、
                 // 还挤爆上下文）。改成「歌手统计 + 少量带序号样例」，这才是对

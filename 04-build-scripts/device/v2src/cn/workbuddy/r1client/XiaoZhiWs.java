@@ -475,6 +475,45 @@ public final class XiaoZhiWs {
             }
             return;
         }
+        if (!PlayerBridge.hasCustomIndex()) {
+            try {
+                JSONArray tools = new JSONArray();
+                tools.put(tool("play_song",
+                        "Phát một bài hát cụ thể trên YouTube (nhận tên bài hát, kèm tên ca sĩ nếu người dùng nói). Tự xếp thêm các bài liên quan vào hàng đợi.",
+                        prop("title", "string", "Tên bài hát (kèm ca sĩ nếu có, ví dụ: 'Lạc Trôi Sơn Tùng')")));
+                tools.put(tool("play_artist",
+                        "Phát danh sách nhiều bài hát của một ca sĩ, ban nhạc hoặc thể loại trên YouTube.",
+                        props(prop("artist", "string", "Tên ca sĩ hoặc thể loại nhạc"),
+                                prop("count", "integer", "Số lượng bài (tùy chọn)"))));
+                tools.put(tool("random",
+                        "Phát nhạc ngẫu nhiên trên YouTube khi người dùng nói mở nhạc/phát nhạc mà không chỉ định tên bài hay ca sĩ.",
+                        prop("count", "integer", "Số lượng bài (tùy chọn)")));
+                tools.put(tool("pause", "Tạm dừng nhạc đang phát.", null));
+                tools.put(tool("play", "Tiếp tục phát nhạc sau khi tạm dừng.", null));
+                tools.put(tool("stop", "Dừng hẳn phát nhạc.", null));
+                tools.put(tool("next", "Chuyển sang bài tiếp theo.", null));
+                tools.put(tool("prev", "Quay lại bài trước.", null));
+                tools.put(tool("volume", "Đặt âm lượng loa từ 0 đến 100.",
+                        prop("level", "integer", "Mức âm lượng 0~100")));
+                tools.put(tool("status", "Kiểm tra loa có đang phát nhạc không và đang phát bài nào.", null));
+                tools.put(tool("seek_play", "Tua nhanh/lùi (delta tính bằng giây, âm là lùi) hoặc nhảy tới giây sec.",
+                        props(prop("sec", "integer", "Giây tuyệt đối muốn nhảy tới"),
+                                prop("delta", "integer", "Số giây tua nhanh (+) hoặc lùi (-)"))));
+
+                addLightTools(tools);
+                addAlarmTools(tools);
+                addSessionTools(tools);
+
+                JSONObject result = new JSONObject();
+                result.put("tools", tools);
+                sendMcpResult(id, result);
+                SessionLog.i("-> mcp tools/list: " + tools.length()
+                        + " tools (YouTube slim: 11 music + light + alarm + session)");
+            } catch (Throwable t) {
+                Log.e(TAG, "sendMcpToolsResult(yt slim) threw", t);
+            }
+            return;
+        }
         try {
             JSONArray tools = new JSONArray();
             tools.put(tool("play_song", "播放**指定的某一首**歌。用户说「播放晴天」「我想听七里香」时用这个，必须传 title（完整歌名）。它会把这一首排在第一位、后面接上整个曲库，播完自动续播；如果你想连播某个歌手的**多首**，改用 play_artist。不知道该播什么时先用 list 或 search 查库里有什么。⚠️ 电台（先锋898、FM91.8 这类）不是歌，要用 play_radio。这是让音箱出声的入口之一，不要只调 play。★ 用户把**歌手和歌名一起说了**（「播放周杰伦的晴天」「我想听陈奕迅的浮夸」），请把整句**原样**传进 title，不要自己拆成只有歌名 —— 后台会按歌手+歌名一起匹配，你只传歌名的话很可能挑到翻唱版。★ 用户**点名要听某首歌**时，直接调这个（哪怕你觉得库里可能没有）—— 后台会先查本地曲库，没有就**自动去在线搜索**并播放；**不要**先调 search 试探（search 只覆盖本地曲库池，搜不到不代表没有这首歌）。★ 返回结果里如果写了「还有 N 首同名的」，说明库里有多个版本（原唱/翻唱/Live），**必须把这件事告诉用户**并问要不要换（如「还找到周杰伦版的，要听吗」），不要闷声播完就当完事。",
