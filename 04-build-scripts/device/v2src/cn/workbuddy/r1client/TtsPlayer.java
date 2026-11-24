@@ -57,6 +57,38 @@ public final class TtsPlayer {
      */
     public static volatile int holdSilenceMs = 4000;
 
+    /** P2: Independent AI TTS AudioTrack volume scaling (10..100%, default 50%). */
+    public static volatile int ttsVolPct = 50;
+    private static volatile TtsPlayer activeInstance = null;
+
+    public static int getTtsVolPct() {
+        return ttsVolPct;
+    }
+
+    public static void setTtsVolPct(int pct) {
+        if (pct < 10) pct = 10;
+        if (pct > 100) pct = 100;
+        ttsVolPct = pct;
+        TtsPlayer inst = activeInstance;
+        if (inst != null) {
+            inst.applyGain(inst.track);
+        }
+    }
+
+    private void applyGain(AudioTrack t) {
+        if (t == null) {
+            return;
+        }
+        try {
+            if (t.getState() == AudioTrack.STATE_INITIALIZED) {
+                float g = ttsVolPct / 100.0f;
+                t.setVolume(g);
+            }
+        } catch (Throwable e) {
+            Log.w(TAG, "AudioTrack.setVolume failed", e);
+        }
+    }
+
     private static final int SAMPLE_RATE = AudioCapture.SAMPLE_RATE;
 
     private final LinkedBlockingQueue<byte[]> queue = new LinkedBlockingQueue<byte[]>();
@@ -144,6 +176,8 @@ public final class TtsPlayer {
             return;
         }
         running = true;
+        activeInstance = this;
+        applyGain(track);
         track.play();
         player = new Thread(new Runnable() {
             public void run() {
@@ -151,7 +185,7 @@ public final class TtsPlayer {
             }
         }, "R1TtsPlayer");
         player.start();
-        Log.i(TAG, "TtsPlayer started, minBuf=" + minBuf + "(fixed) buf=" + bufBytes);
+        Log.i(TAG, "TtsPlayer started, minBuf=" + minBuf + "(fixed) buf=" + bufBytes + " ttsVol=" + ttsVolPct + "%");
     }
 
     /** 是否已成功启动（AudioTrack 就绪且播放线程在跑） */
@@ -225,6 +259,7 @@ public final class TtsPlayer {
             try {
                 t.pause();
                 t.flush();
+                applyGain(t);
                 t.play();
             } catch (Throwable e) {
                 Log.w(TAG, "AudioTrack flush failed", e);
@@ -448,6 +483,9 @@ public final class TtsPlayer {
 
     public void stop() {
         running = false;
+        if (activeInstance == this) {
+            activeInstance = null;
+        }
         holdUntilMs = 0L;   // v1.3.48
         synchronized (lock) {
             lock.notifyAll();

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="vi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
@@ -8,12 +8,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="小智">
+<meta name="apple-mobile-web-app-title" content="XiaoZhi R1">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>R1 小智控制台</title>
+<title>Bảng điều khiển R1 XiaoZhi</title>
 <style>
 :root{
   --bg:#0a0e16; --card:rgba(255,255,255,.055); --card2:rgba(255,255,255,.085);
@@ -411,13 +411,13 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
   <div class="top">
     <div class="r1">
       <span class="dot" id="dot"></span>
-      <span class="nm" id="dev">R1 小智</span>
+      <span class="nm" id="dev">R1 XiaoZhi</span>
       <span class="pill" id="wsPill">WS …</span>
     </div>
-    <div class="sub" id="sub">连接中…</div>
+    <div class="sub" id="sub">Đang kết nối…</div>
   </div>
 
-  <!-- ================= Tab 1：正在播放 ================= -->
+  <!-- ================= Tab 1: Đang phát ================= -->
   <section id="s-play" class="on">
     <div class="card">
       <div class="np">
@@ -430,11 +430,9 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
             <span class="star" id="npStar" onclick="favToggleCur()">☆</span></div>
           <div class="a" id="npA"> </div>
           <div class="a2" id="npMeta"></div>
-          <!-- pl-1.6.29：码率 / 格式（含电台）——三路退化：Exo Format → URL 里的 /64k.mp3 → HEAD 探测 -->
           <div class="a2 q" id="npQual"></div>
-          <span class="tag" id="npTag" style="visibility:hidden">本地音乐</span>
-          <!-- pl-1.6.163：这条流是不是服务端在转码（同风格第二颗，颜色用青） -->
-          <span class="tag tc" id="npTc" style="visibility:hidden">转码</span>
+          <span class="tag" id="npTag" style="visibility:hidden">Nhạc nội bộ</span>
+          <span class="tag tc" id="npTc" style="visibility:hidden">Chuyển mã</span>
         </div>
       </div>
       <div class="prog">
@@ -446,161 +444,140 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
         <div class="cb main" id="bPlay" onclick="togglePlay()"><svg id="icPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         <div class="cb" id="bNext" onclick="skip(1)"><svg viewBox="0 0 24 24"><path d="M15.5 6H18v12h-2.5zM6 6l8.5 6L6 18z"/></svg></div>
       </div>
-      <!-- 播放控制并入正在播放卡（v 顶栏合并）：暂停/继续 = 中间大键（togglePlay
-           播放中=暂停、空闲=继续/重播），不再单列重复按钮。 -->
       <div class="btns" style="margin-top:12px">
-        <button class="btn pri" onclick="act('random', randomExtra())">随便听</button>
-        <button class="btn" onclick="act('stop')">停止</button>
-        <button class="btn" onclick="act('reload')">重载索引</button>
-        <button class="btn" onclick="act('status')">播放在哪</button>
-        <!-- v pl-1.6.16：歌词（可折叠，当前行跟播放位置高亮） -->
-        <button class="btn" id="bLrc" onclick="toggleLrc()">歌词</button>
+        <button class="btn pri" onclick="act('random', randomExtra())">Nghe ngẫu nhiên</button>
+        <button class="btn" onclick="act('stop')">Dừng</button>
+        <button class="btn" onclick="act('reload')">Tải lại nguồn</button>
+        <button class="btn" onclick="act('status')">Trạng thái</button>
+        <button class="btn" id="bLrc" onclick="toggleLrc()">Lời bài hát</button>
       </div>
-      <!-- pl-1.6.17：滚轮/触屏翻歌词时记一下时间，5 秒内不让自动滚动抢（见 lrcTick） -->
       <div class="lrcbox" id="lrcBox" onwheel="LRCUSR=Date.now()" ontouchmove="LRCUSR=Date.now()">
         <div class="hd" id="lrcHd"></div>
         <div id="lrcLines"></div>
       </div>
       <div class="moderow">
-        <span class="mlab">循环</span>
+        <span class="mlab">Lặp lại</span>
         <div class="seg" id="segMode">
-          <div data-v="2" onclick="setMode(2)">顺序播放</div>
-          <div data-v="1" onclick="setMode(1)">随机</div>
-          <div data-v="3" onclick="setMode(3)">单曲循环</div>
+          <div data-v="2" onclick="setMode(2)">Tuần tự</div>
+          <div data-v="1" onclick="setMode(1)">Ngẫu nhiên</div>
+          <div data-v="3" onclick="setMode(3)">Lặp 1 bài</div>
         </div>
       </div>
       <div class="note" id="npNote"></div>
     </div>
 
     <div class="card tight">
-      <div class="ttl">音量 <span class="hint" id="volHint">系统音量</span></div>
+      <div class="ttl">Âm lượng <span class="hint" id="volHint">Âm lượng hệ thống</span></div>
       <div class="volrow">
         <input type="range" id="vol" min="0" max="15" value="1" oninput="onVolDrag(this.value)">
         <span class="v" id="volV">1 / 15</span>
-        <button class="btn sm" id="volApply" onclick="volApply()">应用</button>
+        <button class="btn sm" id="volApply" onclick="volApply()">Áp dụng</button>
       </div>
-      <div class="note" style="margin-top:6px">防误触：拖动只改显示，点「应用」才真正生效；
-        3 秒不点会自动还原到原音量。</div>
+      <div class="note" style="margin-top:6px">Chống chạm nhầm: kéo để chọn mức, bấm «Áp dụng» mới có hiệu lực;
+        sau 3 giây không bấm sẽ tự hoàn về mức cũ.</div>
     </div>
 
     <div class="card">
-      <div class="ttl">播放队列 <span class="hint" id="qHint">点一下即播</span><span class="lnk" onclick="jumpCur()">定位当前</span></div>
+      <div class="ttl">Danh sách phát <span class="hint" id="qHint">Chạm để phát ngay</span><span class="lnk" onclick="jumpCur()">Tới bài đang phát</span></div>
       <div class="scroll" id="queue"><div class="note" style="margin:0">—</div></div>
     </div>
   </section>
 
-  <!-- ================= Tab 2：音乐 ================= -->
+  <!-- ================= Tab 2: Âm nhạc ================= -->
   <section id="s-music">
     <div class="card">
-      <div class="ttl">电台 <span class="hint" id="radioHint"></span></div>
+      <div class="ttl">Đài phát thanh <span class="hint" id="radioHint"></span></div>
       <div class="inline">
-        <input type="text" id="rKey" placeholder="搜台名（如 新闻 / 音乐）" oninput="filterRadio(this.value)">
-        <button class="btn sm" onclick="clearRadio()">清空</button>
+        <input type="text" id="rKey" placeholder="Tìm tên đài (VD: tin tức / âm nhạc)" oninput="filterRadio(this.value)">
+        <button class="btn sm" onclick="clearRadio()">Xóa</button>
       </div>
       <div class="scroll r5" id="radios" style="margin-top:10px"><div class="note" style="margin:0">—</div></div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn" onclick="act('radio_all')">全部电台连播</button>
+        <button class="btn" onclick="act('radio_all')">Phát tất cả đài</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="ttl">搜索曲库 <span class="hint">留空点搜索 = 列全部；留空点「在线搜歌」= 随机 100 首；填了词点「在线搜歌」= 搜 NAS 全源</span></div>
+      <div class="ttl">Tìm nhạc <span class="hint">Để trống bấm Tìm = liệt kê tất cả; để trống bấm Tìm online = ngẫu nhiên 100 bài</span></div>
       <div class="inline">
-        <input type="text" id="qKey" placeholder="歌名 / 歌手（搜到的点一下就播）" onkeydown="if(event.key==='Enter')doSearch()">
-        <button class="btn sm" onclick="doSearch()">搜索</button>
-        <button class="btn sm" onclick="doSearchOnline()">在线搜歌</button>
+        <input type="text" id="qKey" placeholder="Tên bài hát / ca sĩ (chạm kết quả để phát)" onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="btn sm" onclick="doSearch()">Tìm</button>
+        <button class="btn sm" onclick="doSearchOnline()">Tìm online</button>
       </div>
-      <!-- v1.3.196：一键把「当前搜索结果」整批排进播放列表。
-           以前想连播只能一首首点（点一条只播一条）。 -->
       <div class="btns" style="margin-top:10px">
-        <button class="btn" onclick="queueAll()">全部载入播放列表</button>
+        <button class="btn" onclick="queueAll()">Đưa tất cả vào danh sách phát</button>
       </div>
       <div class="scroll" id="qRes" style="margin-top:10px"></div>
     </div>
 
-    <!-- ★ pl-1.6.42：我的收藏 —— 在听的 / 搜到的 / 队列里的歌都能点 ☆ 收进来，
-         整批可一键导入播放列表，也能跟小智说「播放我喜欢的歌」。 -->
     <div class="card">
-      <!-- ★ pl-1.6.63：去掉「刷新」—— 收藏是 device 的主本，增删后本来就自动回拉，
-           这个链接反而是个「点了没变化」的假动作。 -->
-      <div class="ttl">我的收藏 <span class="hint" id="favHint">点 ☆ 收藏</span></div>
+      <div class="ttl">Yêu thích <span class="hint" id="favHint">Chạm ☆ để lưu</span></div>
       <div class="btns">
-        <button class="btn pri" id="btnFavPlay" onclick="favPlay()">导入播放列表并播放</button>
-        <button class="btn sm" onclick="favClear()">清空</button>
+        <button class="btn pri" id="btnFavPlay" onclick="favPlay()">Nạp vào hàng đợi &amp; phát</button>
+        <button class="btn sm" onclick="favClear()">Xóa hết</button>
         <input type="file" id="favFile" accept=".txt,text/plain" style="display:none" onchange="favImportFile(this)">
       </div>
       <div class="scroll r5" id="favList" style="margin-top:10px"><div class="note" style="margin:0">—</div></div>
-      <div class="note" style="margin-top:8px">收藏存在小智进程里（重启音箱也不丢）。
-        也能语音操作：「收藏这首歌」「我喜欢这首歌」「取消收藏」「播放我喜欢的歌」。</div>
+      <div class="note" style="margin-top:8px">Danh sách yêu thích được lưu trong thiết bị (khởi động lại loa không mất).</div>
       <div class="row2" style="display:flex;gap:8px;margin-top:10px">
-        <button class="btn sm" style="flex:1" onclick="favExport()">备份歌单</button>
-        <button class="btn sm" id="btnFavImport" style="flex:1" onclick="$('favFile').click()">上传歌单</button>
+        <button class="btn sm" style="flex:1" onclick="favExport()">Sao lưu danh sách</button>
+        <button class="btn sm" id="btnFavImport" style="flex:1" onclick="$('favFile').click()">Tải lên danh sách</button>
       </div>
     </div>
 
-    <!-- ★ v1.3.288 / pl-1.6.117：节目（有声书）。搜索只列书名版本（不拉集），
-         点书名弹窗选集（仿重链接模式：首行=最近播放，后顺序显示，带内部集数搜索）；
-         收藏独立成「我的节目」，与「我的收藏」（歌曲）分开，且带最近播放集数+秒数记忆。 -->
     <div class="card">
-      <div class="ttl">节目 <span class="hint">搜书名版本 · 点书名弹窗选集/搜内部集</span></div>
+      <div class="ttl">Sách nói / Chương trình <span class="hint">Tìm theo tên sách · Chạm tên để chọn tập</span></div>
       <div class="inline">
-        <input type="text" id="ebQ" placeholder="书名 / 主播，如：凡人修仙传 关彦之" oninput="ebSearchInput()">
-        <button class="btn sm" id="ebSearchBtn" onclick="ebSearchBtn()">搜索</button>
+        <input type="text" id="ebQ" placeholder="Tên sách / người đọc" oninput="ebSearchInput()">
+        <button class="btn sm" id="ebSearchBtn" onclick="ebSearchBtn()">Tìm</button>
       </div>
-      <div class="note" id="ebHint" style="margin-top:8px">搜索只列书名版本（不拉集），点书名弹窗选集、搜内部集数点播。</div>
+      <div class="note" id="ebHint" style="margin-top:8px">Tìm kiếm chỉ liệt kê đầu sách, chạm vào tên sách để mở danh sách tập.</div>
       <div class="scroll r5 progbox" id="ebResults" style="margin-top:8px;max-height:236px;overflow-y:auto"><div class="note" style="margin:0">—</div></div>
 
-      <div class="ttl" style="margin-top:14px">在线节目 <span class="hint">在线收藏（与「我的收藏」分开）· 点书名弹窗</span></div>
+      <div class="ttl" style="margin-top:14px">Chương trình online <span class="hint">Sách đã lưu · Chạm tên để mở</span></div>
       <div class="scroll r5 progbox" id="ebProg" style="margin-top:8px;max-height:236px;overflow-y:auto"><div class="note" style="margin:0">—</div></div>
 
-      <!-- ★ v1.2.0：本地节目（NAS 有声书目录）。与上面「在线节目」并列：
-           只拉书名（点开才拉集），合集先列子书、再进子书列分集，带返回按钮；
-           记忆按子书各存一份（NAS 侧 files/ab_local_pos.json），父级同时显示各子项记忆。 -->
-      <div class="ttl" style="margin-top:14px">本地节目 <span class="hint">NAS 有声书目录 · 点书名展开 · 带记忆</span></div>
+      <div class="ttl" style="margin-top:14px">Chương trình nội bộ <span class="hint">Thư mục sách nói NAS · Có lưu tiến độ</span></div>
       <div class="inline">
-        <input type="text" id="ablQ" placeholder="搜本地书名 / 子书，如：三体" oninput="ablSearchInput()">
-        <button class="btn sm" id="ablBtn" onclick="ablSearchBtn()">搜索</button>
-        <!-- v1.3.0：手动校验一次（NAS 重扫过但页面还挂着缓存时用） -->
-        <button class="btn sm" onclick="ablLoad('',true)">刷新</button>
+        <input type="text" id="ablQ" placeholder="Tìm sách nội bộ / tập con" oninput="ablSearchInput()">
+        <button class="btn sm" id="ablBtn" onclick="ablSearchBtn()">Tìm</button>
+        <button class="btn sm" onclick="ablLoad('',true)">Làm mới</button>
       </div>
       <div class="note" id="ablHint" style="margin-top:8px">—</div>
       <div class="scroll r5 progbox" id="ablList" style="margin-top:8px;max-height:236px;overflow-y:auto"><div class="note" style="margin:0">—</div></div>
     </div>
 
     <div class="card">
-      <div class="ttl">直链播放</div>
+      <div class="ttl">Phát từ liên kết trực tiếp</div>
       <div class="inline">
         <input type="text" id="qUrl" placeholder="http://…/song.mp3">
-        <button class="btn sm" onclick="act('play_url','url='+encodeURIComponent(v('qUrl')))">播放</button>
+        <button class="btn sm" onclick="act('play_url','url='+encodeURIComponent(v('qUrl')))">Phát</button>
       </div>
     </div>
   </section>
 
-  <!-- ================= Tab 3：闹钟 ================= -->
+  <!-- ================= Tab 3: Báo thức ================= -->
   <section id="s-alarm">
     <div class="card tight" id="alRingCard" style="display:none;border-color:rgba(251,191,36,.5)">
-      <div class="lb" id="alRingTitle" style="font-size:15px;font-weight:600">闹钟正在响</div>
-      <div class="note" style="margin-top:4px">「关闭这次」只让这一回停，闹钟本身照旧开着，明天到点还会响</div>
+      <div class="lb" id="alRingTitle" style="font-size:15px;font-weight:600">Báo thức đang reo</div>
+      <div class="note" style="margin-top:4px">«Tắt lần này» chỉ dừng chuông hiện tại, báo thức vẫn giữ nguyên cho ngày mai</div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn pri" onclick="alDismiss()">关闭这次</button>
+        <button class="btn pri" onclick="alDismiss()">Tắt lần này</button>
       </div>
     </div>
 
-    <!-- v1.3.251：常显「下一個响铃歌曲」，设完铃声立刻同步 -->
     <div class="card tight" id="alNextRingCard" style="display:none;border-color:rgba(251,191,36,.4)">
-      <div class="lb">下一個响铃歌曲</div>
+      <div class="lb">Nhạc chuông báo thức kế tiếp</div>
       <div class="ds" id="alNextRing">—</div>
     </div>
 
     <div class="card">
-      <div class="ttl">新建闹钟</div>
-      <!-- ★ pl-1.6.87：时间不再用 <input type="time">（Android 上会弹 Material 表盘，
-           跟这套卡片风格完全不搭）—— 点大号时间就地展开，手输 + 横向滑动两步都能选。 -->
+      <div class="ttl">Tạo báo thức mới</div>
       <div class="hmrow" id="alHmRow" onclick="alHmToggle()">
         <div class="hmbig"><span id="alHhTxt">07</span><i>:</i><span id="alMmTxt">00</span></div>
         <div class="hmmeta">
-          <div class="lb">响铃时间</div>
-          <div class="ds" id="alHmDesc">点一下改时间：滑动挑，也能直接输入</div>
+          <div class="lb">Giờ báo thức</div>
+          <div class="ds" id="alHmDesc">Chạm để đổi giờ: trượt chọn hoặc nhập số trực tiếp</div>
         </div>
         <div class="hmchev">⌄</div>
       </div>
@@ -613,218 +590,215 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
             oninput="alHmTyped()" onblur="alHmClamp()">
           <button class="btn sm" onclick="alHmShift(-30)">-30</button>
           <button class="btn sm" onclick="alHmShift(30)">+30</button>
-          <button class="btn sm" onclick="alHmNow()">此刻</button>
+          <button class="btn sm" onclick="alHmNow()">Hiện tại</button>
         </div>
-        <div class="lb" style="margin-top:10px;font-size:12px;color:var(--tx3);font-weight:600">时</div>
+        <div class="lb" style="margin-top:10px;font-size:12px;color:var(--tx3);font-weight:600">Giờ</div>
         <div class="hstrip" id="alHStrip"></div>
-        <div class="lb" style="margin-top:8px;font-size:12px;color:var(--tx3);font-weight:600">分</div>
+        <div class="lb" style="margin-top:8px;font-size:12px;color:var(--tx3);font-weight:600">Phút</div>
         <div class="hstrip" id="alMStrip"></div>
-        <div class="note" style="margin-top:6px">手指划一下就选，松手自动停在最近一格；
-          分钟也能直接打 1~59 任意值</div>
+        <div class="note" style="margin-top:6px">Vuốt ngang để chọn nhanh, thả tay sẽ tự khớp nấc gần nhất;
+          có thể nhập trực tiếp phút từ 0~59</div>
       </div>
       <div class="row" style="margin-top:10px">
-        <div><div class="lb">重复</div><div class="ds" id="alRepDesc">每天这个点都响</div></div>
+        <div><div class="lb">Lặp lại</div><div class="ds" id="alRepDesc">Reo vào giờ này mỗi ngày</div></div>
         <select id="alRepeat" onchange="alRepChange()">
-          <option value="daily">每天</option>
-          <option value="weekly">每周</option>
-          <option value="once">仅一次</option>
+          <option value="daily">Hàng ngày</option>
+          <option value="weekly">Hàng tuần</option>
+          <option value="once">Một lần</option>
         </select>
       </div>
       <div id="alDaysWrap" style="display:none;margin-top:12px">
-        <div class="lb" style="margin-bottom:6px">每周哪几天</div>
+        <div class="lb" style="margin-bottom:6px">Các ngày trong tuần</div>
         <div class="seg" id="segDays">
-          <div data-v="1" onclick="alDayTap(1)">一</div>
-          <div data-v="2" onclick="alDayTap(2)">二</div>
-          <div data-v="3" onclick="alDayTap(3)">三</div>
-          <div data-v="4" onclick="alDayTap(4)">四</div>
-          <div data-v="5" onclick="alDayTap(5)">五</div>
-          <div data-v="6" onclick="alDayTap(6)">六</div>
-          <div data-v="7" onclick="alDayTap(7)">日</div>
+          <div data-v="1" onclick="alDayTap(1)">T2</div>
+          <div data-v="2" onclick="alDayTap(2)">T3</div>
+          <div data-v="3" onclick="alDayTap(3)">T4</div>
+          <div data-v="4" onclick="alDayTap(4)">T5</div>
+          <div data-v="5" onclick="alDayTap(5)">T6</div>
+          <div data-v="6" onclick="alDayTap(6)">T7</div>
+          <div data-v="7" onclick="alDayTap(7)">CN</div>
         </div>
-        <div class="note" style="margin-top:6px">工作日就是周一到周五；一天都不选不会生效</div>
+        <div class="note" style="margin-top:6px">Ngày làm việc là T2–T6; cần chọn ít nhất một ngày</div>
       </div>
       <div class="row" style="margin-top:12px">
-        <div><div class="lb">响铃歌曲</div><div class="ds" id="alSongPick">默认：随机播一首</div></div>
-        <button class="btn sm" onclick="alPickSong('')">选择</button>
+        <div><div class="lb">Nhạc chuông</div><div class="ds" id="alSongPick">Mặc định: phát ngẫu nhiên 1 bài</div></div>
+        <button class="btn sm" onclick="alPickSong('')">Chọn</button>
       </div>
       <div class="row" style="margin-top:14px">
         <div style="flex:1">
-          <div class="lb">闹钟音量 <span class="hint" id="alVolTxt">—</span></div>
-          <div class="ds" id="alVolSys">响了把音量设成这个值，关闭后还原</div>
+          <div class="lb">Âm lượng báo thức <span class="hint" id="alVolTxt">—</span></div>
+          <div class="ds" id="alVolSys">Khi reo sẽ chỉnh âm lượng tới mức này, tắt sẽ hoàn về cũ</div>
         </div>
       </div>
       <div class="volrow">
         <input type="range" id="alVol" min="20" max="100" step="5" value="50"
           oninput="alVolDrag(this.value)">
         <span class="v" id="alVolV">50%</span>
-        <button class="btn sm" id="alVolApply" onclick="alVolApply()">应用</button>
+        <button class="btn sm" id="alVolApply" onclick="alVolApply()">Áp dụng</button>
       </div>
-      <div class="note" style="margin-top:2px">防误触：拖动只改显示，点「应用」才生效；
-        3 秒不点自动还原。响铃时把媒体流设成这个值，关掉后回到你原来的音乐音量。
-        铃声放在设备铃声目录里，断网也能响</div>
+      <div class="note" style="margin-top:2px">Chống chạm nhầm: kéo chỉ đổi hiển thị, bấm «Áp dụng» mới lưu;
+        3 giây không bấm sẽ tự hoàn lại. Nhạc chuông đã lưu trên loa vẫn reo được khi mất mạng.</div>
       <div class="row" style="margin-top:14px;cursor:pointer" onclick="alCacheToggle()">
         <div style="flex:1">
-          <div class="lb">铃声缓存 <span class="hint" id="alCacheTxt">—</span>
-            <span class="hint" style="opacity:.55">（点击展开）</span></div>
-          <div class="ds" id="alCacheDir">主动指定的铃声会自动存到设备上，随机的不存</div>
+          <div class="lb">Bộ nhớ đệm nhạc chuông <span class="hint" id="alCacheTxt">—</span>
+            <span class="hint" style="opacity:.55">(chạm để mở)</span></div>
+          <div class="ds" id="alCacheDir">Bài hát chọn làm chuông sẽ tự lưu trên thiết bị, bài ngẫu nhiên không lưu</div>
         </div>
-        <button class="btn sm" onclick="event.stopPropagation();alCacheClear()">清空</button>
+        <button class="btn sm" onclick="event.stopPropagation();alCacheClear()">Xóa hết</button>
       </div>
-      <!-- ★ pl-1.6.144：缓存清单一多就无限往下长（这 div 以前光秃秃一个 id，没任何限高）——
-           跟节目三栏一样封顶，超出就在列表里滑。内联 max-height/overflow 是兜底，别删。 -->
       <div id="alCacheList" class="scroll r5 progbox" style="display:none;margin-top:8px;max-height:236px;overflow-y:auto"></div>
       <div class="btns" style="margin-top:12px">
-        <button class="btn pri" onclick="alAdd()">添加闹钟</button>
+        <button class="btn pri" onclick="alAdd()">Thêm báo thức</button>
       </div>
-      <div class="note" style="margin-top:6px">也可以直接跟小智说「每天早上七点叫我」「明天七点叫我」
-        「周一到周五七点半叫我」</div>
+      <div class="note" style="margin-top:6px">Bạn cũng có thể ra lệnh giọng nói trực tiếp cho XiaoZhi để đặt báo thức.</div>
     </div>
 
     <div class="card">
-      <div class="ttl">我的闹钟 <span class="hint" id="alHint">—</span></div>
-      <div id="alList"><div class="note" style="margin:0">(加载中)</div></div>
-      <div class="note" style="margin-top:10px">左边开关 = 停用 / 启用（停用之后到点也不再响）；
-        点「歌」可以换这一条的响铃歌曲。闹钟跑在小智本体进程里，关掉语音助手也不影响它。</div>
+      <div class="ttl">Báo thức của tôi <span class="hint" id="alHint">—</span></div>
+      <div id="alList"><div class="note" style="margin:0">(Đang tải)</div></div>
+      <div class="note" style="margin-top:10px">Công tắc bên trái = Bật / Tắt báo thức;
+        nút «Nhạc» để đổi bài chuông. Báo thức chạy trong tiến trình thiết bị, tắt trợ lý giọng nói vẫn hoạt động.</div>
     </div>
   </section>
 
-  <!-- ================= Tab 4：设置 ================= -->
+  <!-- ================= Tab 4: Cài đặt ================= -->
   <section id="s-set">
     <div class="card">
-      <div class="ttl">服务器</div>
-      <div class="note" style="margin-top:6px">小智官方控制台：<a href="https://xiaozhi.me/" target="_blank" rel="noopener" style="color:#fff">xiaozhi.me</a>（绑定设备 / 管理对话）</div>
-      <input type="text" id="inOta" placeholder="OTA 地址（留空 = 官方）">
-      <input type="text" id="inWs" placeholder="WebSocket 地址（留空 = 由 OTA 地址获取）" style="margin-top:8px">
-      <input type="text" id="inToken" placeholder="服务器 Token（留空 = 用 OTA 返回的）" style="margin-top:8px">
+      <div class="ttl">Máy chủ</div>
+      <div class="note" style="margin-top:6px">Trang quản trị XiaoZhi chính thức: <a href="https://xiaozhi.me/" target="_blank" rel="noopener" style="color:#fff">xiaozhi.me</a> (liên kết thiết bị / quản lý hội thoại)</div>
+      <input type="text" id="inOta" placeholder="Địa chỉ OTA (để trống = chính thức)">
+      <input type="text" id="inWs" placeholder="Địa chỉ WebSocket (để trống = lấy từ OTA)" style="margin-top:8px">
+      <input type="text" id="inToken" placeholder="Token máy chủ (để trống = dùng của OTA)" style="margin-top:8px">
       <div class="btns" style="margin-top:10px">
-        <button class="btn pri" onclick="saveServer()">保存并切换</button>
-        <button class="btn" onclick="useOfficial()">用官方</button>
+        <button class="btn pri" onclick="saveServer()">Lưu &amp; chuyển</button>
+        <button class="btn" onclick="useOfficial()">Dùng mặc định</button>
       </div>
-      <div class="kv" style="margin-top:10px"><span>生效中 OTA</span><b id="curOta">—</b></div>
-      <div class="kv"><span>生效中 WS</span><b id="curWs">—</b></div>
-      <div class="kv"><span>生效中 Token</span><b id="curToken">—</b></div>
-      <div class="kv"><span>激活码</span><b id="kCode">—</b></div>
+      <div class="kv" style="margin-top:10px"><span>OTA đang dùng</span><b id="curOta">—</b></div>
+      <div class="kv"><span>WS đang dùng</span><b id="curWs">—</b></div>
+      <div class="kv"><span>Token đang dùng</span><b id="curToken">—</b></div>
+      <div class="kv"><span>Mã kích hoạt</span><b id="kCode">—</b></div>
     </div>
 
     <div class="card">
-      <div class="ttl">小智进程 <span class="hint">本页面由 player 提供</span></div>
-      <!-- device v1.3.199 的语音软开关（省电模式）—— 挂在小智进程这一栏里，
-           与下面的「停用小智」不是一回事：这里 device 进程还活着，
-           web 控制台、电台、曲库搜索、点播全都不受影响。 -->
+      <div class="ttl">Tiến trình XiaoZhi <span class="hint">Trang web chạy từ player</span></div>
       <div class="row">
-        <div><div class="lb">语音助手</div><div class="ds">关 = 省电：不唤醒、不收音、不连小智服务器；电台 / 搜索 / 点播照常</div></div>
+        <div><div class="lb">Trợ lý giọng nói</div><div class="ds">Tắt = tiết kiệm điện: không đánh thức, không thu âm, không nối máy chủ XiaoZhi; đài / tìm nhạc vẫn dùng bình thường</div></div>
         <div class="sw" id="swVoice" onclick="vpToggle()"></div>
       </div>
-      <div class="note" id="vpNote">状态：—</div>
+      <div class="note" id="vpNote">Trạng thái: —</div>
       <div class="note" id="devNote" style="margin-top:8px">—</div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn" id="btnOff" onclick="devOff()">停用小智</button>
-        <button class="btn pri" id="btnOn" onclick="devOn()">启用小智</button>
+        <button class="btn" id="btnOff" onclick="devOff()">Tắt XiaoZhi</button>
+        <button class="btn pri" id="btnOn" onclick="devOn()">Bật XiaoZhi</button>
       </div>
-      <div class="note" style="margin-top:8px">停用的是 <b>com.phicomm.speaker.device</b>（小智+麦克风+云端）。
-        蓝牙 / DLNA / AirPlay 与本页面都在 player 进程里，不受影响。</div>
+      <div class="note" style="margin-top:8px">Tắt sẽ dừng <b>com.phicomm.speaker.device</b> (XiaoZhi + mic + cloud).
+        Bluetooth / DLNA / AirPlay và trang điều khiển này chạy bên player nên không bị ảnh hưởng.</div>
     </div>
 
     <div class="card">
-      <div class="ttl">音频与行为</div>
-      <div class="ttl" style="margin-top:2px">上行增益 <span class="hint">越大越灵敏</span></div>
+      <div class="ttl">Âm thanh &amp; Hành vi</div>
+      <div class="ttl" style="margin-top:2px">Khuếch đại mic (Gain) <span class="hint">Khuyên dùng: 4 (cao quá dễ vỡ tiếng)</span></div>
       <div class="seg" id="segGain">
         <div data-v="1">1</div><div data-v="4">4</div><div data-v="8">8</div>
         <div data-v="16">16</div><div data-v="32">32</div>
       </div>
       <div class="row" style="margin-top:10px">
-        <div><div class="lb">上行 ALC</div><div class="ds">自动补偿原厂 AGC 漂移；与固定增益互斥</div></div>
+        <div><div class="lb">Tự cân bằng mic (ALC)</div><div class="ds">Tự bù độ nhạy mic; loại trừ lẫn nhau với mức Gain cố định</div></div>
         <div class="sw" id="swAlc" onclick="tg('swAlc','alc')"></div>
       </div>
       <div class="row">
-        <div><div class="lb">丢弃唤醒词音频</div><div class="ds">不把「小智小智」这截上行发给服务器</div></div>
+        <div><div class="lb">Âm lượng giọng AI (TTS) <span class="hint" id="lbTtsVol">50%</span></div>
+          <div class="ds">Chỉnh riêng độ lớn giọng XiaoZhi (10–100%) để cân bằng với nhạc Bluetooth từ PC</div></div>
+        <div style="width:140px;flex:none">
+          <input type="range" id="rgTtsVol" min="10" max="100" step="5" value="50"
+                 oninput="ttsVolLive(this.value)">
+        </div>
+      </div>
+      <div class="row">
+        <div><div class="lb">Bỏ âm thanh từ đánh thức</div><div class="ds">Không gửi đoạn âm thanh đánh thức lên máy chủ</div></div>
         <div class="sw" id="swDw" onclick="tg('swDw','dropWake')"></div>
       </div>
-      <div class="note" id="chainNote">采集链路：—</div>
+      <div class="note" id="chainNote">Chuỗi thu âm: —</div>
 
-      <div class="ttl" style="margin-top:14px">行为</div>
+      <div class="ttl" style="margin-top:14px">Hành vi</div>
       <div class="row">
-        <div><div class="lb">提示音</div><div class="ds">唤醒「叮」与断连提示音</div></div>
+        <div><div class="lb">Âm báo</div><div class="ds">Tiếng «ting» khi đánh thức và âm báo ngắt phiên</div></div>
         <div class="sw" id="swSnd" onclick="tg('swSnd','sound')"></div>
       </div>
       <div class="row">
-        <div><div class="lb">会话日志落盘</div><div class="ds">files/r1client.log，256KB 轮转</div></div>
+        <div><div class="lb">Ghi nhật ký hội thoại</div><div class="ds">files/r1client.log, tự xoay vòng 256KB</div></div>
         <div class="sw" id="swLog" onclick="tg('swLog','log')"></div>
       </div>
       <div class="row">
-        <div><div class="lb">空闲自动断开</div><div class="ds">60s 空闲自动断开（关 = 90s）；抢在小智告别语前挂断、本地补一声</div></div>
+        <div><div class="lb">Tự ngắt khi rảnh</div><div class="ds">Bật = tự ngắt sau thời gian chờ bên dưới (mặc định 10s); Tắt = 90s</div></div>
         <div class="sw" id="swAd" onclick="tg('swAd','autoDisconnect')"></div>
       </div>
+      <div class="inline" style="margin-top:8px">
+        <span class="lb" style="min-width:130px">Chờ tự ngắt (giây)</span>
+        <input type="number" id="inIdleSec" min="5" max="600" placeholder="10">
+        <button class="btn sm" onclick="saveIdleSec()">Áp dụng</button>
+      </div>
       <div class="row">
-        <div><div class="lb">音乐为小智让路</div><div class="ds">小智开口即暂停；说完等 2.5s 没下文才接回（期间又开口则继续让路）</div></div>
+        <div><div class="lb">Tạm dừng nhạc khi AI nói</div><div class="ds">XiaoZhi nói sẽ tạm dừng nhạc; nói xong 2.5s mới phát tiếp</div></div>
         <div class="sw" id="swMp" onclick="tg('swMp','musicPause')"></div>
       </div>
       <div class="row">
-        <div><div class="lb">自定义音乐库</div><div class="ds">关 = 用小智服务器自带音乐（会断开当前连接）</div></div>
+        <div><div class="lb">Kho nhạc NAS tùy chỉnh</div><div class="ds">Tắt (mặc định) = giảm 28 công cụ NAS Trung Quốc, dùng nguồn mặc định</div></div>
         <div class="sw" id="swMm" onclick="tg('swMm','myMusic')"></div>
       </div>
       <div class="row">
-        <div><div class="lb">显示自定义歌曲名</div><div class="ds">开 = 收藏列表只显示导入时的自定义名（忽略匹配到的真名）；关 = 有匹配显示匹配名，无匹配显示自定义名</div></div>
+        <div><div class="lb">Hiển thị tên bài tùy chỉnh</div><div class="ds">Bật = luôn hiện tên gốc khi nhập danh sách yêu thích; Tắt = ưu tiên tên đã khớp</div></div>
         <div class="sw" id="swFavCustom" onclick="tgFavCustom()"></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="ttl">音乐源 <span class="hint">每行一个 index.json</span></div>
-      <textarea id="inIdx" placeholder="http://192.168.2.189:8100/index.json"></textarea>
+      <div class="ttl">Nguồn nhạc NAS <span class="hint">Mỗi dòng một link index.json</span></div>
+      <textarea id="inIdx" placeholder="http://192.168.1.100:8100/index.json"></textarea>
       <div class="btns" style="margin-top:10px">
-        <button class="btn pri" onclick="saveIndex()">保存并重载</button>
-        <button class="btn" onclick="act('reload')">仅重载</button>
+        <button class="btn pri" onclick="saveIndex()">Lưu &amp; tải lại</button>
+        <button class="btn" onclick="act('reload')">Chỉ tải lại</button>
       </div>
       <div id="srcList" style="margin-top:10px"></div>
     </div>
 
     <div class="card">
-      <div class="ttl">曲目数量 <span class="hint">本地 / 在线各一栏</span></div>
+      <div class="ttl">Giới hạn số bài hát <span class="hint">Nội bộ / Online</span></div>
       <div class="inline">
-        <span class="lb" style="min-width:74px">本地</span>
+        <span class="lb" style="min-width:74px">Nội bộ</span>
         <input type="number" id="inQlim" min="0" max="2000" placeholder="300">
-        <button class="btn sm" onclick="saveQlim()">应用</button>
+        <button class="btn sm" onclick="saveQlim()">Áp dụng</button>
       </div>
       <div class="inline" style="margin-top:8px">
-        <span class="lb" style="min-width:74px">在线</span>
+        <span class="lb" style="min-width:74px">Online</span>
         <input type="number" id="inOlim" min="10" max="300" placeholder="300">
-        <button class="btn sm" onclick="saveOlim()">应用</button>
+        <button class="btn sm" onclick="saveOlim()">Áp dụng</button>
       </div>
-      <div class="note" style="margin-top:6px"><b>本地</b>：列表最多显示多少首，「随便听」也按这个数挑；
-        <b>0 = 不限制</b>（列全部）。<br>
-        <b>在线</b>：所有从 NAS 拉在线歌的途径统一按这个数 —— 语音说「播放周杰伦的歌」补的在线曲目、
-        「随机播放在线音乐」、页面「在线搜歌」，都是同一个上限（10~300，300 = NAS 一次能给的上限）。<br>
-        在线曲目只是拉列表，真正播放那一刻才取链 ⇒ 多拿不花时间。</div>
+      <div class="note" style="margin-top:6px"><b>Nội bộ</b>: số bài tối đa hiển thị trong danh sách (<b>0 = không giới hạn</b>).<br>
+        <b>Online</b>: số bài tối đa lấy từ NAS khi tìm hoặc nghe ngẫu nhiên (10~300).</div>
     </div>
 
     <div class="card">
-      <div class="ttl">灯光控制 <span class="hint">四项各自独立</span></div>
+      <div class="ttl">Điều khiển đèn LED <span class="hint">4 mục độc lập</span></div>
       <div class="row">
-        <div><div class="lb">氛围灯</div><div class="ds">彩色灯效（随音乐频谱变色），跑在 player 里</div></div>
+        <div><div class="lb">Đèn viền âm nhạc</div><div class="ds">Hiệu ứng đèn màu đổi theo nhịp nhạc (chạy bên player)</div></div>
         <div class="sw" id="swAmb" onclick="ambToggle()"></div>
       </div>
-      <!-- pl-1.6.32：多彩 = 氛围灯的**子项**（二选一），不是独立开关。
-           氛围灯总开关关着时两档都不生效 ⇒ 选「多彩」时会顺手把总开关打开。 -->
       <div class="row sub">
-        <div><div class="lb">灯效</div><div class="ds">原厂 = 15 颗同色随频谱变色；多彩 = 每次闪动把 15 颗颜色乱序重排（不含白色）</div></div>
-        <div class="seg" id="segAmbMode" style="width:190px;flex:none">
-          <div data-v="factory" onclick="setAmbMode('factory')">原厂</div>
-          <div data-v="multi" onclick="setAmbMode('multi')">多彩</div>
-          <div data-v="solo" onclick="setAmbMode('solo')">单色</div>
+        <div><div class="lb">Chế độ màu</div><div class="ds">Gốc = 15 đèn đổi màu theo nhạc; Đa sắc = đảo màu ngẫu nhiên; Đơn sắc = 1 màu cố định</div></div>
+        <div class="seg" id="segAmbMode" style="width:205px;flex:none">
+          <div data-v="factory" onclick="setAmbMode('factory')">Gốc</div>
+          <div data-v="multi" onclick="setAmbMode('multi')">Đa sắc</div>
+          <div data-v="solo" onclick="setAmbMode('solo')">Đơn sắc</div>
         </div>
       </div>
-      <!-- pl-1.6.59：单色档的取色 —— 只在单色模式出现（别的档位挂着会误导）。
-           取的是**色相**：亮度仍由每一帧的音量决定 ⇒ 单色也是「跟音乐明暗」的氛围灯。 -->
       <div class="row sub" id="rowSoloColor" style="display:none">
-        <div><div class="lb">单色</div><div class="ds">15 颗同一个颜色，亮度仍跟着音乐起伏</div></div>
+        <div><div class="lb">Màu đơn sắc</div><div class="ds">15 đèn cùng một màu, độ sáng vẫn nhấp nháy theo nhạc</div></div>
         <input type="color" id="inSoloColor" value="#FF8C1A" oninput="ambSoloColor(this.value)"
                style="width:60px;height:30px;flex:none">
       </div>
-      <!-- pl-1.6.56：多彩换色速度。以前写死 100ms 换一次（一秒十次全盘重排），
-           用户嫌太快；现在可调 60ms ~ 3 秒，默认 600ms。滑块拖动即发（节流 200ms）。 -->
       <div class="row sub" id="rowAmbMs">
-        <div><div class="lb">多彩速度</div><div class="ds">隔多久换一次颜色：越往右越慢（60ms ~ 3000ms）</div></div>
+        <div><div class="lb">Tốc độ đổi màu</div><div class="ds">Khoảng thời gian đổi màu: kéo sang phải càng chậm (60ms ~ 3000ms)</div></div>
         <div style="width:150px;flex:none">
           <input type="range" id="rgAmbMs" min="60" max="3000" step="20" value="600"
                  oninput="ambMsLive(this.value)">
@@ -832,50 +806,37 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
         </div>
       </div>
       <div class="row">
-        <div><div class="lb">唤醒灯</div><div class="ds">唤醒时亮起，定格在收音方向（24 颗拾音灯）</div></div>
+        <div><div class="lb">Đèn đánh thức</div><div class="ds">Sáng định hướng về phía người nói khi gọi từ đánh thức (24 đèn đỉnh)</div></div>
         <div class="sw" id="swWkL" onclick="tg('swWkL','wakeLight',1)"></div>
       </div>
-      <!-- v1.3.204：聆听灯 —— 同一组拾音灯，但跟着「小智在听」走：
-           建连/聆听时亮，思考与播报时灭，说完话回到聆听再亮。
-           关掉它只影响「全程亮着」，唤醒那一闪照旧。 -->
       <div class="row">
-        <div><div class="lb">聆听灯</div><div class="ds">小智在听就亮（同一组拾音灯），思考/播报/说完收工就灭</div></div>
+        <div><div class="lb">Đèn đang nghe</div><div class="ds">Sáng trong lúc XiaoZhi lắng nghe, tắt khi trả lời hoặc kết thúc</div></div>
         <div class="sw" id="swLsL" onclick="tg('swLsL','listenLight',1)"></div>
       </div>
       <div class="row">
-        <div><div class="lb">播报灯</div><div class="ds">识别中与小智说话期间的蓝色氛围环</div></div>
+        <div><div class="lb">Đèn đang trả lời</div><div class="ds">Vòng đèn xanh dương khi đang nhận diện và phát giọng nói</div></div>
         <div class="sw" id="swBsL" onclick="tg('swBsL','busyLight',1)"></div>
       </div>
-
-      <!-- pl-1.6.51：夜灯 —— 当小夜灯用（顶部 24 颗 + 底部 15 颗全亮，可只开一样）。
-           ★ 夜灯期间唤醒灯 / 播报灯 / 聆听灯**全部停用**（免得互相打架），
-             关掉夜灯才恢复 —— 所以它是独立的一档，不跟上面四项混在一起。
-           ★ 顶 / 底**都由 player 直写 sysfs**（照抄小飞版那条 `lights_test set
-             7fffff8000 ffffff`），不走灯效服务 —— 走服务的话关灯时它会从 pending
-             复活，表现就是「关不掉」。 -->
       <div class="row">
-        <div><div class="lb">夜灯</div><div class="ds">总开关：开 = 按下面选的组亮灯；关 = 全灭、灯效恢复正常。★ 夜灯期间上面四项灯效全部停用</div></div>
+        <div><div class="lb">Đèn ngủ</div><div class="ds">Công tắc tổng: Bật = sáng theo nhóm chọn bên dưới; Tắt = trở lại đèn bình thường. ★ Khi bật đèn ngủ, 4 đèn hiệu ứng phía trên tạm tắt</div></div>
         <div class="sw" id="swNight" onclick="nightToggle()"></div>
       </div>
       <div class="row sub">
-        <div><div class="lb">亮哪一组</div><div class="ds">只是「开灯时亮哪一组」的选择，★ 不是开关 —— 夜灯关着时改它不会点灯</div></div>
-        <div class="seg" id="segNightPart" style="width:190px;flex:none">
-          <div data-v="both" onclick="nightPart('both')">都亮</div>
-          <div data-v="top" onclick="nightPart('top')">只顶部</div>
-          <div data-v="amb" onclick="nightPart('amb')">只底部</div>
+        <div><div class="lb">Vùng sáng</div><div class="ds">Chỉ là cấu hình vùng đèn sẽ sáng khi bật Đèn ngủ</div></div>
+        <div class="seg" id="segNightPart" style="width:205px;flex:none">
+          <div data-v="both" onclick="nightPart('both')">Cả hai</div>
+          <div data-v="top" onclick="nightPart('top')">Đỉnh</div>
+          <div data-v="amb" onclick="nightPart('amb')">Đáy</div>
         </div>
       </div>
       <div class="row sub">
-        <div><div class="lb">夜灯颜色</div><div class="ds">底部氛围灯的颜色（顶部那 24 颗是白色，改不了）</div></div>
+        <div><div class="lb">Màu đèn ngủ</div><div class="ds">Màu của vòng đèn đáy (24 đèn đỉnh chỉ có màu trắng)</div></div>
         <input type="color" id="inNightColor" value="#ff8c1a" oninput="nightColor(this.value)"
                style="width:56px;height:30px;flex:none;padding:0;border:none;background:none">
       </div>
-      <!-- ★ 亮度上限 100：实测原厂 PlayerVisualizer.setLumaGain() 只收 0..100，传 200 会
-           静默 return -1（logcat 里连那行日志都没有）。夜灯的亮度是我们自己缩放底部
-           RGB，不过原厂那一关，但同口径取 0..100，免得页面上两套数字对不上。 -->
       <div class="row sub">
-        <div><div class="lb">底部亮度 <span id="lbNightLuma">30%</span></div>
-          <div class="ds">亮度不建议超过 60%，过高会导致发热，严重影响灯条寿命</div></div>
+        <div><div class="lb">Độ sáng đáy <span id="lbNightLuma">30%</span></div>
+          <div class="ds">Khuyên dùng dưới 60% để tránh nóng và bảo vệ tuổi thọ dải LED</div></div>
         <input type="range" id="rgNightLuma" min="0" max="100" value="30"
                oninput="nightLumaLive(this.value)"
                style="width:140px;flex:none">
@@ -883,155 +844,144 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
     </div>
 
     <div class="card">
-      <div class="ttl">安装到桌面 <span class="hint">PWA</span></div>
-      <div class="note" id="instNote" style="margin:0">检查中…</div>
+      <div class="ttl">Cài ra màn hình chính <span class="hint">PWA</span></div>
+      <div class="note" id="instNote" style="margin:0">Đang kiểm tra…</div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn" id="btnInstall" onclick="doInstall()">安装应用</button>
-        <button class="btn" id="btnCopyFlag" onclick="copyFlag()" style="display:none">复制地址</button>
+        <button class="btn" id="btnInstall" onclick="doInstall()">Cài ứng dụng</button>
+        <button class="btn" id="btnCopyFlag" onclick="copyFlag()" style="display:none">Sao chép địa chỉ</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="ttl">播放引擎 <span class="hint" id="engHint">—</span></div>
+      <div class="ttl">Bộ giải mã phát nhạc <span class="hint" id="engHint">—</span></div>
       <div class="btns" style="margin-top:8px">
         <button class="btn" id="btnEngExo" onclick="setEngine('exo')">ExoPlayer 2.18</button>
-        <button class="btn" id="btnEngMp" onclick="setEngine('mp')">MediaPlayer（原厂）</button>
+        <button class="btn" id="btnEngMp" onclick="setEngine('mp')">MediaPlayer (gốc)</button>
       </div>
       <div class="note" style="margin-top:8px">
-        切换会重启 <b>:NetPlayer</b> 播放进程（音乐断约 5 秒，队列和播放位置会重来）。
-        <b>ExoPlayer</b>：起播快、重复 play 幂等（电台不再卡顿）、拖动 seek 可用；
-        <b>MediaPlayer</b>：原厂 NuPlayer，兼容性最好（老 FLAC/APE 之类的兜底），
-        但电台起播后会卡 3 秒、seek 走原厂那条更慢的路。
+        Chuyển đổi sẽ khởi động lại tiến trình <b>:NetPlayer</b> (ngắt nhạc khoảng 5 giây).
+        <b>ExoPlayer</b>: phát nhanh, hỗ trợ tua mượt, đài radio không giật;
+        <b>MediaPlayer</b>: bộ phát gốc của ROM, tương thích tốt với FLAC/APE cũ.
       </div>
     </div>
 
     <div class="card">
-      <div class="ttl">连接设置 <span class="hint" id="btHint">—</span></div>
+      <div class="ttl">Kết nối không dây <span class="hint" id="btHint">—</span></div>
       <div class="btns" style="margin-top:8px">
-        <button class="btn pri" id="btnBtOn" onclick="btToggle()">打开蓝牙</button>
-        <button class="btn" onclick="btScan()">扫描设备</button>
-        <button class="btn" id="btnBtDisc" onclick="btDisc()" title="只开放 60 秒：连上自动收回，没人连 1 分钟后自动收回">可被搜到：关（60 秒）</button>
+        <button class="btn pri" id="btnBtOn" onclick="btToggle()">Bật Bluetooth</button>
+        <button class="btn" onclick="btScan()">Quét thiết bị</button>
+        <button class="btn" id="btnBtDisc" onclick="btDisc()" title="Chỉ mở trong 60 giây: tự đóng khi có thiết bị kết nối hoặc hết 1 phút">Hiển thị tìm kiếm: Tắt (60s)</button>
       </div>
       <div class="note" id="btNote" style="margin-top:8px">—</div>
       <div id="btList" class="vscroll"></div>
 
-      <div class="ttl" style="margin-top:14px">外部播放源 <span class="hint">DLNA / AirPlay</span></div>
+      <div class="ttl" style="margin-top:14px">Nguồn phát ngoài <span class="hint">DLNA / AirPlay</span></div>
       <div class="kv"><span>DLNA</span><b id="kDlna">—</b></div>
       <div class="kv"><span>AirPlay</span><b id="kAir">—</b></div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn pri" id="btnDlna" onclick="svcToggle('dlna')">开 DLNA</button>
-        <button class="btn pri" id="btnAir" onclick="svcToggle('airplay')">开 AirPlay</button>
+        <button class="btn pri" id="btnDlna" onclick="svcToggle('dlna')">Bật DLNA</button>
+        <button class="btn pri" id="btnAir" onclick="svcToggle('airplay')">Bật AirPlay</button>
       </div>
       <div class="note" id="svcNote" style="margin-top:8px">—</div>
-      <div class="note" style="margin-top:6px">开的是<b>程序里的功能</b>（AIDL 的
-        <code>startServer()</code> / <code>stopServer()</code>），<b>进程保留</b>。<br>
-        ★ 原厂代码里<b>从来没调用过 startServer</b> —— 这就是手机搜不到 DLNA、
-        AirPlay 也不广播的根因：不是开关被关，是没人去开。<br>
-        ★ 状态不靠记录：DLNA 开着就占 <code>UDP 1900</code>(SSDP)，AirPlay 开着就占
-        <code>TCP 5002</code>(RAOP)，直接读内核 socket 表，功能死了状态立刻跟着变。</div>
+      <div class="note" style="margin-top:6px">Bật/tắt dịch vụ <code>startServer()</code> / <code>stopServer()</code> qua AIDL.
+        Trạng thái được kiểm tra trực tiếp qua cổng hệ thống (DLNA: <code>UDP 1900</code>, AirPlay: <code>TCP 5002</code>).</div>
     </div>
 
     <div class="card">
-      <div class="ttl">设备状态 <span class="hint">进这页每 5 秒自动刷</span><span
-        class="lnk" onclick="loadDev(1)">手动刷新</span></div>
-      <div class="kv"><span>CPU 占用</span><b id="kCpu">—</b></div>
-      <div class="kv"><span>内存占用</span><b id="kMem">—</b></div>
-      <div class="kv"><span>温度</span><b id="kTemp">—</b></div>
-      <div class="kv"><span>存储空间</span><b id="kDisk">—</b></div>
-      <div class="kv"><span>进程</span><b id="kProc">—</b></div>
+      <div class="ttl">Trạng thái thiết bị <span class="hint">Tự làm mới mỗi 5 giây</span><span
+        class="lnk" onclick="loadDev(1)">Làm mới</span></div>
+      <div class="kv"><span>CPU</span><b id="kCpu">—</b></div>
+      <div class="kv"><span>RAM</span><b id="kMem">—</b></div>
+      <div class="kv"><span>Nhiệt độ</span><b id="kTemp">—</b></div>
+      <div class="kv"><span>Bộ nhớ trong</span><b id="kDisk">—</b></div>
+      <div class="kv"><span>Tiến trình</span><b id="kProc">—</b></div>
       <div class="note" id="cleanNote" style="margin-top:8px">—</div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn dgr" id="btnClean" onclick="doClean()">一键清理无用进程</button>
-        <button class="btn" onclick="doRestore()">恢复已禁用服务</button>
+        <button class="btn dgr" id="btnClean" onclick="doClean()">Dọn tiến trình thừa</button>
+        <button class="btn" onclick="doRestore()">Khôi phục dịch vụ</button>
       </div>
-      <div class="note" style="margin-top:6px">禁用清单共 16 个（电话/下载/VPN/定位/
-        产测/OTA/bugreport/ijetty 之类音箱上用不到的），只禁<b>已安装</b>的那几个，一个不多禁；
-        再清一遍 /data 缓存。<br>
-        保护名单（launcher / systemtool / netctl / 蓝牙 / 播放 / 小智 / 包安装容器）一律不碰。<br>
-        用的是 <b>pm hide</b>（包级停用）—— 直接 kill 不管用：同 uid 的会被系统拉回来，
-        别人的 uid 又杀不动（Operation not permitted）。</div>
+      <div class="note" style="margin-top:6px">Vô hiệu hóa tối đa 16 dịch vụ hệ thống không dùng trên loa (điện thoại, VPN, định vị, OTA…) bằng <b>pm hide</b> và xóa bộ nhớ đệm /data.
+        Các tiến trình cốt lõi (Bluetooth, phát nhạc, XiaoZhi, mạng) luôn được bảo vệ.</div>
       <div class="kv"><span>Device ID</span><b id="kDid">—</b></div>
       <div class="kv"><span>Client ID</span><b id="kCid">—</b></div>
-      <div class="kv"><span>本机 IP</span><b id="kIp">—</b></div>
-      <div class="kv"><span>会话状态</span><b id="kSt">—</b></div>
-      <div class="kv"><span>上行电平</span><b id="kRaw">—</b></div>
+      <div class="kv"><span>Địa chỉ IP</span><b id="kIp">—</b></div>
+      <div class="kv"><span>Trạng thái phiên</span><b id="kSt">—</b></div>
+      <div class="kv"><span>Mức tín hiệu mic</span><b id="kRaw">—</b></div>
       <div class="btns" style="margin-top:12px">
-        <button class="btn dgr" onclick="doRestart()">重启小智</button>
-        <button class="btn dgr" onclick="doReboot()">重启音箱</button>
+        <button class="btn dgr" onclick="doRestart()">Khởi động lại XiaoZhi</button>
+        <button class="btn dgr" onclick="doReboot()">Khởi động lại loa</button>
       </div>
-      <div class="note" style="margin-top:6px">「重启音箱」= 整机重启，约 30s；
-        我们的进程是 u0_a8（没有 REBOOT 权限），靠 adb 回环连 adbd 实现。</div>
+      <div class="note" style="margin-top:6px">«Khởi động lại loa» sẽ reboot toàn bộ thiết bị (mất khoảng 30 giây).</div>
     </div>
 
     <div class="card">
-      <div class="ttl">会话日志 <span class="hint">我说了什么 / 小智回了什么</span></div>
+      <div class="ttl">Nhật ký hội thoại <span class="hint">Bạn nói gì / XiaoZhi trả lời gì</span></div>
       <div class="row">
-        <div><div class="lb">仅显示对话</div><div class="ds">滤掉内部调试行，只看一问一答</div></div>
+        <div><div class="lb">Chỉ hiện hội thoại</div><div class="ds">Lọc bỏ dòng debug hệ thống, chỉ xem hỏi đáp</div></div>
         <div class="sw" id="swChat" onclick="tgChat()"></div>
       </div>
       <div class="row">
-        <div><div class="lb">自动刷新</div><div class="ds">每 5 秒拉一次（切走这一页就停）</div></div>
+        <div><div class="lb">Tự động làm mới</div><div class="ds">Cập nhật mỗi 5 giây khi mở trang này</div></div>
         <div class="sw" id="swAuto" onclick="tgAuto()"></div>
       </div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn pri" onclick="loadLog()">刷新</button>
-        <button class="btn" onclick="loadLog(400)">拉 400 行</button>
-        <button class="btn" onclick="copyLog()">复制</button>
+        <button class="btn pri" onclick="loadLog()">Làm mới</button>
+        <button class="btn" onclick="loadLog(400)">Tải 400 dòng</button>
+        <button class="btn" onclick="copyLog()">Sao chép</button>
       </div>
-      <div class="log" id="logBox" style="margin-top:10px;max-height:46vh;overflow:auto">(加载中)</div>
+      <div class="log" id="logBox" style="margin-top:10px;max-height:46vh;overflow:auto">(Đang tải)</div>
     </div>
 
     <div class="card">
       <div class="btns">
-        <button class="btn" onclick="showQR('donate')">赞赏</button>
-        <button class="btn" onclick="showQR('group')">讨论群</button>
+        <button class="btn" onclick="showQR('donate')">Ủng hộ tác giả</button>
+        <button class="btn" onclick="showQR('group')">Nhóm thảo luận</button>
       </div>
     </div>
 
     <div class="foot">
-      <div><span id="footVer">—</span> · 仅局域网可达，无鉴权</div>
-      <div>项目地址：<a href="https://github.com/shj4588/Phicomm_R1_XiaoZhi_Client" target="_blank" rel="noopener">https://github.com/shj4588/Phicomm_R1_XiaoZhi_Client</a></div>
+      <div><span id="footVer">—</span> · Chỉ truy cập trong mạng LAN</div>
+      <div>Dự án gốc: <a href="https://github.com/shj4588/Phicomm_R1_XiaoZhi_Client" target="_blank" rel="noopener">https://github.com/shj4588/Phicomm_R1_XiaoZhi_Client</a></div>
     </div>
   </section>
 </div>
 
 <nav class="tabbar">
   <div class="on" data-t="play" onclick="tab('play')">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5z"/></svg>播放
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5z"/></svg>Phát nhạc
   </div>
   <div data-t="music" onclick="tab('music')">
-    <svg viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>音乐
+    <svg viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Âm nhạc
   </div>
   <div data-t="alarm" onclick="tab('alarm')">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.6 1.8M4.6 3.6L2.4 6M19.4 3.6L21.6 6"/></svg>闹钟
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.6 1.8M4.6 3.6L2.4 6M19.4 3.6L21.6 6"/></svg>Báo thức
   </div>
   <div data-t="set" onclick="tab('set')">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7.5 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 14a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 7.5l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.6 1.6 0 0 0 21 10a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>设置
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7.5 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 14a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 7.5l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.6 1.6 0 0 0 21 10a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>Cài đặt
   </div>
 </nav>
 
 <div id="toast"></div>
 
-<!-- 两个弹窗各自独立：点遮罩/标题/说明（= 图片外任意处）都关闭；只有图片本身吃掉点击 -->
 <div id="donate" style="display:none;position:fixed;inset:0;z-index:80;background:rgba(3,6,12,.86);
   backdrop-filter:blur(8px);place-items:center" onclick="hideQR()">
   <div style="text-align:center">
-    <div style="color:var(--tx);font-size:15px;font-weight:600;margin-bottom:10px">赞赏</div>
-    <img src="/donate.png" alt="赞赏" onclick="event.stopPropagation()"
+    <div style="color:var(--tx);font-size:15px;font-weight:600;margin-bottom:10px">Ủng hộ tác giả</div>
+    <img src="/donate.png" alt="Ủng hộ" onclick="event.stopPropagation()"
          style="width:290px;max-width:80vw;border-radius:16px;display:block">
-    <div style="color:var(--tx2);margin-top:12px;font-size:13px;max-width:290px">本项目完全免费，是否捐赠不影响功能使用</div>
-    <div style="color:var(--tx3);margin-top:6px;font-size:12px">点图片外任意处关闭</div>
+    <div style="color:var(--tx2);margin-top:12px;font-size:13px;max-width:290px">Dự án hoàn toàn miễn phí</div>
+    <div style="color:var(--tx3);margin-top:6px;font-size:12px">Chạm bên ngoài ảnh để đóng</div>
   </div>
 </div>
 
 <div id="group" style="display:none;position:fixed;inset:0;z-index:80;background:rgba(3,6,12,.86);
   backdrop-filter:blur(8px);place-items:center" onclick="hideQR()">
   <div style="text-align:center">
-    <div style="color:var(--tx);font-size:15px;font-weight:600;margin-bottom:10px">讨论群</div>
-    <img src="/group.png" alt="讨论群二维码" onclick="event.stopPropagation()"
+    <div style="color:var(--tx);font-size:15px;font-weight:600;margin-bottom:10px">Nhóm thảo luận</div>
+    <img src="/group.png" alt="Mã QR nhóm" onclick="event.stopPropagation()"
          style="width:290px;max-width:80vw;border-radius:16px;display:block">
-    <div style="color:var(--tx2);margin-top:12px;font-size:13px;max-width:290px">QQ 玩机讨论群：885906281</div>
-    <div style="color:var(--tx3);margin-top:6px;font-size:12px">点图片外任意处关闭</div>
+    <div style="color:var(--tx2);margin-top:12px;font-size:13px;max-width:290px">Nhóm QQ cộng đồng gốc: 885906281</div>
+    <div style="color:var(--tx3);margin-top:6px;font-size:12px">Chạm bên ngoài ảnh để đóng</div>
   </div>
 </div>
 
@@ -1039,15 +989,15 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
   backdrop-filter:blur(8px);padding:20px 14px;overflow:auto">
   <div style="max-width:520px;margin:0 auto;background:var(--card);border:1px solid var(--line);
     border-radius:16px;padding:14px">
-    <div style="color:var(--tx);font-size:15px;font-weight:600">选择响铃歌曲</div>
-    <div class="note" style="margin-top:2px">从收藏里挑一首；找不到就先用「默认随机」</div>
-    <input type="text" id="alQ" placeholder="搜索歌名 / 歌手" oninput="alQF()" style="margin-top:10px">
+    <div style="color:var(--tx);font-size:15px;font-weight:600">Chọn nhạc chuông báo thức</div>
+    <div class="note" style="margin-top:2px">Chọn một bài từ danh sách yêu thích, hoặc dùng mặc định ngẫu nhiên</div>
+    <input type="text" id="alQ" placeholder="Tìm tên bài hát / ca sĩ" oninput="alQF()" style="margin-top:10px">
     <div id="alQL" class="vscroll" style="margin-top:8px;max-height:44vh;overflow:auto">
-      <div class="note" style="margin:0">(加载中)</div>
+      <div class="note" style="margin:0">(Đang tải)</div>
     </div>
     <div class="btns" style="margin-top:12px">
-      <button class="btn" onclick="alPickRandom()">默认（随机一首）</button>
-      <button class="btn pri" onclick="alPickClose()">取消</button>
+      <button class="btn" onclick="alPickRandom()">Mặc định (ngẫu nhiên)</button>
+      <button class="btn pri" onclick="alPickClose()">Hủy</button>
     </div>
   </div>
 </div>
@@ -1138,7 +1088,7 @@ function qualTxt() {
   if (QFMT) a.push(QFMT);
   if (QBR > 0) a.push(QBR + "kbps");
   if (QSR > 0) a.push((QSR / 1000).toFixed(QSR % 1000 === 0 ? 0 : 1) + "kHz");
-  if (QCH > 0) a.push(QCH === 1 ? "单声道" : (QCH === 2 ? "立体声" : QCH + "声道"));
+  if (QCH > 0) a.push(QCH === 1 ? "Mono" : (QCH === 2 ? "Stereo" : QCH + " kênh"));
   return a.join(" · ");
 }
 function paintQual() {
@@ -1146,7 +1096,7 @@ function paintQual() {
   if (!e) return;
   e.textContent = qualTxt();
   /* 排障：鼠标悬停看得到这行是哪儿来的（exo / url / head） */
-  e.title = QSRC ? ("码率来源：" + QSRC) : "";
+  e.title = QSRC ? ("Nguồn bitrate: " + QSRC) : "";
 }
 var LRC = null, LRCKEY = "", LRCOPEN = false, LRCIDX = -1, LRCUSR = 0;
 /* ★ pl-1.6.10（插值重写）：
@@ -1205,17 +1155,17 @@ function esc(s) {
 }
 /* 会话状态 / 运行时长 —— 中文化（后端给的是枚举名，直接显示 IDLE 这类不好读） */
 var ST_CN = {
-  IDLE: "空闲", CONNECTING: "连接中", LISTENING: "聆听中", TTS_PLAYING: "播报中",
-  "-": "未知", "未运行": "小智未运行", OFF: "未运行", UNKNOWN: "未知"
+  IDLE: "Rảnh", CONNECTING: "Đang kết nối", LISTENING: "Đang nghe", TTS_PLAYING: "Đang nói",
+  "-": "Không rõ", "未运行": "XiaoZhi chưa chạy", OFF: "Chưa chạy", UNKNOWN: "Không rõ"
 };
 function stCn(s) { return ST_CN[s] || s || "—"; }
 function upCn(sec) {
   var s = Math.max(0, +sec || 0);
-  if (s < 60) return s + " 秒";
+  if (s < 60) return s + " giây";
   var mi = Math.floor(s / 60);
-  if (mi < 60) return mi + " 分钟";
+  if (mi < 60) return mi + " phút";
   var h = Math.floor(mi / 60), mm = mi % 60;
-  return h + " 小时" + (mm ? " " + mm + " 分" : "");
+  return h + " giờ" + (mm ? " " + mm + " phút" : "");
 }
 var toastT = null;
 /* ================= 统一弹窗（pl-1.6.88） =================
@@ -1234,13 +1184,13 @@ function uiDlg(o) {
   ov.id = "uiOv"; ov.className = "modal-ov";
   var icon = o.danger ? '<span class="ic" style="color:var(--warn)">⚠</span>' : "";
   ov.innerHTML = '<div class="modal">'
-    + '<div class="modal-t">' + icon + esc(o.title || "提示") + "</div>"
+    + '<div class="modal-t">' + icon + esc(o.title || "Thông báo") + "</div>"
     + '<div class="modal-b">' + esc(o.text || "") + "</div>"
     + '<div class="modal-foot">'
     + (o.single ? "" : '<button class="btn" onclick="uiDlgClose(0)">'
-        + esc(o.cancel || "取消") + "</button>")
+        + esc(o.cancel || "Hủy") + "</button>")
     + '<button class="btn ' + (o.danger ? "dgr" : "pri") + '" onclick="uiDlgClose(1)">'
-    + esc(o.ok || "确定") + "</button></div></div>";
+    + esc(o.ok || "Xác nhận") + "</button></div></div>";
   document.body.appendChild(ov);
   UIDLG_CB = o.onOk || null;
   ov.onclick = function (e) { if (e.target === ov) { uiDlgClose(0); } };
@@ -1253,11 +1203,11 @@ function uiDlgClose(v) {
 }
 function uiConfirm(text, onOk, o) {
   o = o || {};
-  uiDlg({ title: o.title || "确认", text: text, ok: o.ok, cancel: o.cancel,
+  uiDlg({ title: o.title || "Xác nhận", text: text, ok: o.ok, cancel: o.cancel,
           danger: o.danger, single: false, onOk: onOk });
 }
 function uiAlert(text, onOk) {
-  uiDlg({ title: "提示", text: text, single: true, ok: "知道了", onOk: onOk });
+  uiDlg({ title: "Thông báo", text: text, single: true, ok: "Đã hiểu", onOk: onOk });
 }
 
 function toast(m) {
@@ -1312,8 +1262,8 @@ function paintPos(pos) {
     return;
   }
   if (live) {
-    $("npDur").textContent = "直播";
-    $("npPos").textContent = wait ? "缓冲中" : (STALL ? "没出声" : "直播中");
+    $("npDur").textContent = "Trực tiếp";
+    $("npPos").textContent = wait ? "Đang tải" : (STALL ? "Không có tiếng" : "Đang phát trực tiếp");
     $("npBar").style.width = "0%";
     var kb0 = $("prKnob");
     if (kb0) kb0.style.left = "0%";
@@ -1321,7 +1271,7 @@ function paintPos(pos) {
   }
   $("npDur").textContent = dur > 0 ? fmt(dur) : "—";
   /* 没出声之前进度位不显示时间 —— 那正是以前「时间一直在走」的观感来源 */
-  $("npPos").textContent = wait ? "缓冲中" : (STALL ? "没出声" : fmt(pos));
+  $("npPos").textContent = wait ? "Đang tải" : (STALL ? "Không có tiếng" : fmt(pos));
   /* ★ pl-1.6.12：暂停也要保住进度条。以前只在 PH==="playing" 时给宽度，
      一按暂停条就归零、再恢复又弹回原位，看着像动画抽风。
      起播缓冲（loading）期间确实没有落点 ⇒ 归零。 */
@@ -1485,15 +1435,15 @@ function fetchLrc(force) {
   /* ★ pl-1.6.27：电台不取歌词（同上：流标题匹配出来的必是错歌），连请求都不发 */
   if (QRADIO) {
     LRC = null; LRCKEY = ""; LRCIDX = -1;
-    if ($("lrcHd")) $("lrcHd").textContent = "电台没有歌词";
+    if ($("lrcHd")) $("lrcHd").textContent = "Đài phát thanh không có lời bài hát";
     if ($("lrcLines")) $("lrcLines").innerHTML = "";
     return;
   }
   var k = lrcKey();
   if (!force && LRC && LRCKEY === k) { renderLrc(); return; }
   var t = (MI && MI.title) || "", a = (MI && MI.artist) || "";
-  if (!t) { $("lrcHd").textContent = "先播一首再看歌词"; $("lrcLines").innerHTML = ""; return; }
-  $("lrcHd").textContent = "取歌词中…";
+  if (!t) { $("lrcHd").textContent = "Hãy phát một bài hát để xem lời"; $("lrcLines").innerHTML = ""; return; }
+  $("lrcHd").textContent = "Đang tải lời bài hát…";
   $("lrcLines").innerHTML = "";
   fetch("/api/lrc?t=" + encodeURIComponent(t) + "&a=" + encodeURIComponent(a))
     .then(function (r) { return r.json(); })
@@ -1503,13 +1453,13 @@ function fetchLrc(force) {
       renderLrc();
     })
     .catch(function (e) {
-      $("lrcHd").textContent = "歌词取不到（" + e + "）";
+      $("lrcHd").textContent = "Không tải được lời (" + e + ")";
     });
 }
 function renderLrc() {
   var lines = (LRC && LRC.lines) || [];
   if (!lines.length) {
-    $("lrcHd").textContent = (LRC && LRC.msg) || "这首歌没有歌词";
+    $("lrcHd").textContent = (LRC && LRC.msg) || "Bài hát này chưa có lời";
     $("lrcLines").innerHTML = "";
     return;
   }
@@ -1605,7 +1555,7 @@ function prUp() {
   post("/api/act", "op=seek&ms=" + ms)
     .then(function (r) {
       PR_SEEKING = false;
-      toast((r && r.msg) ? r.msg : "已跳转");
+      toast((r && r.msg) ? r.msg : "Đã tua");
       /* 落点不是 HTTP 回来就算生效的：MediaPlayer.seekTo 是异步的，
          在线流还要重新缓冲 ⇒ 等一下再拉真值，由 syncPos 判定是否落地。 */
       setTimeout(load, 600);
@@ -1613,7 +1563,7 @@ function prUp() {
     .catch(function () {
       PR_SEEKING = false;
       PR_SEEK_TILL = 0; PR_SEEK_WAIT = false;   // 失败了也别把 UI 冻死
-      toast("跳转失败");
+      toast("Tua thất bại");
     });
 }
 function prInit() {
@@ -1642,8 +1592,8 @@ function prInit() {
 function post(url, body) {
   // 演示模式不发真实请求（否则会真的去改设置）
   if (DEMO) {
-    toast("[演示] " + (body || "").split("&")[0]);
-    return Promise.resolve({ ok: true, msg: "[演示] 未真正执行" });
+    toast("[Demo] " + (body || "").split("&")[0]);
+    return Promise.resolve({ ok: true, msg: "[Demo] Không thực thi thật" });
   }
   return fetch(url, {
     method: "POST",
@@ -1654,7 +1604,7 @@ function post(url, body) {
 function act(op, extra, quiet) {
   var b = "op=" + encodeURIComponent(op) + (extra ? "&" + extra : "");
   return post("/api/act", b).then(function (r) {
-    if (!quiet) toast((r && r.msg) ? r.msg : "已执行");   // quiet：UI 自己有乐观回显的开关用
+    if (!quiet) toast((r && r.msg) ? r.msg : "Đã thực hiện");   // quiet：UI 自己有乐观回显的开关用
     setTimeout(load, 400);
     /* ★ v1.3.0：重载曲库 = 曲库可能变了 ⇒ 立刻校验本地书库缓存（at 变了才重绘），
        并把集表缓存清掉（书被重扫后分集可能对不上，宁可重拉一次）。 */
@@ -1664,19 +1614,19 @@ function act(op, extra, quiet) {
     }
     if (op !== "status") wsAsk("get_info");
     return r;
-  }).catch(function () { toast("请求失败"); });
+  }).catch(function () { toast("Yêu cầu thất bại"); });
 }
 /* quiet：UI 自己有乐观回显（开关当场就翻了）⇒ 不再弹提示条。
    灯光控制那几项都是「点一下开关动一下」，弹窗纯属噪音。 */
 function setKV(k, val, quiet) {
   return post("/api/set", k + "=" + encodeURIComponent(val)).then(function (r) {
-    if (!quiet) toast((r && r.msg) ? r.msg : "已保存");
+    if (!quiet) toast((r && r.msg) ? r.msg : "Đã lưu");
     load();
-  }).catch(function () { if (!quiet) toast("保存失败"); });
+  }).catch(function () { if (!quiet) toast("Lưu thất bại"); });
 }
 function doRestart() {
-  uiConfirm("重启小智进程？约 3 秒后自动恢复",
-    function () { act("restart_app"); }, { ok: "重启" });
+  uiConfirm("Khởi động lại tiến trình XiaoZhi? Sẽ tự khôi phục sau khoảng 3 giây",
+    function () { act("restart_app"); }, { ok: "Khởi động lại" });
 }
 
 /* ---------- 播放引擎切换（pl-1.6.24） ----------
@@ -1690,31 +1640,30 @@ function renderEngine() {
   var b1 = $("btnEngExo"), b2 = $("btnEngMp"), h = $("engHint");
   if (b1) b1.className = "btn" + (ENG === "exo" ? " pri" : "");
   if (b2) b2.className = "btn" + (ENG === "mp" ? " pri" : "");
-  if (h) h.textContent = (ENG === "mp") ? "当前：MediaPlayer（原厂）" : "当前：ExoPlayer 2.18";
+  if (h) h.textContent = (ENG === "mp") ? "Đang dùng: MediaPlayer (gốc)" : "Đang dùng: ExoPlayer 2.18";
 }
 function setEngine(v) {
-  if (v === ENG) { toast("现在就是 " + (v === "mp" ? "MediaPlayer" : "ExoPlayer")); return; }
-  uiConfirm("切换到 " + (v === "mp" ? "MediaPlayer（原厂）" : "ExoPlayer 2.18")
-      + "？\n会重启播放进程，音乐断约 5 秒。", function () {
+  if (v === ENG) { toast("Đang sử dụng " + (v === "mp" ? "MediaPlayer" : "ExoPlayer")); return; }
+  uiConfirm("Chuyển sang " + (v === "mp" ? "MediaPlayer (gốc)" : "ExoPlayer 2.18")
+      + "?\nTiến trình phát nhạc sẽ khởi động lại (~5 giây).", function () {
     ENG = v;
     renderEngine();                    // 先乐观上色，真失败的话下一轮 load 会纠正
     post("/api/act", "op=engine&v=" + v).then(function (r) {
-      toast((r && r.msg) ? r.msg : "已切换");
+      toast((r && r.msg) ? r.msg : "Đã chuyển");
       setTimeout(load, 7000);          // 等 :NetPlayer 重建
       setTimeout(load, 13000);
-    }).catch(function () { toast("切换请求失败"); });
-  }, { ok: "切换" });
+    }).catch(function () { toast("Chuyển thất bại"); });
+  }, { ok: "Chuyển" });
 }
 function doReboot() {
-  uiConfirm("整机重启音箱？\n约 30 秒后回来，这期间音箱不可用。", function () {
+  uiConfirm("Khởi động lại toàn bộ loa?\nLoa sẽ hoạt động lại sau khoảng 30 giây.", function () {
     act("reboot").then(function (r) {
       if (r && r.msg) {
-        uiAlert(r.msg + "\n\n若音箱没动静，说明五条策略都失败了 —— "
-          + "只能从电脑上 adb reboot 或直接断电。",
+        uiAlert(r.msg + "\n\nNếu loa không tự khởi động lại, hãy dùng adb reboot từ máy tính hoặc rút nguồn cắm lại.",
           function () { setTimeout(function () { location.reload(); }, 28000); });
       }
     });
-  }, { title: "重启音箱", ok: "重启", danger: true });
+  }, { title: "Khởi động lại loa", ok: "Khởi động lại", danger: true });
 }
 
 /* ---------- 氛围灯 ----------
@@ -1928,7 +1877,7 @@ function setAmbMode(m) {
   }).then(function (r) {
     setTimeout(load, 1600);          // 锁到期前再校准一次，把服务端真值接回来
     return r;
-  }).catch(function () { toast("灯效切换失败"); });
+  }).catch(function () { toast("Chuyển hiệu ứng đèn thất bại"); });
 }
 
 /* ---------- 语音软开关（省电模式）pl-1.6.35 / device v1.3.199 ----------
@@ -1946,10 +1895,10 @@ function vpFill(v) {
   setSw("swVoice", VP.off === 0);          // 开 = 语音助手在跑
   var n = $("vpNote");
   if (!n) return;
-  var head = VP.off === 1 ? "省电模式：唤醒 / 收音 / 小智本体已停用，web 电台与点播照常"
-    : VP.off === 0 ? "语音助手运行中"
-    : "未知（小智未运行，8088 不可达）";
-  n.textContent = "状态：" + head + (v.last && String(v.last) !== "-" ? " ｜ " + v.last : "");
+  var head = VP.off === 1 ? "Chế độ tiết kiệm điện: đã tắt đánh thức / mic / XiaoZhi, web radio vẫn hoạt động"
+    : VP.off === 0 ? "Trợ lý giọng nói đang chạy"
+    : "Không rõ (XiaoZhi chưa chạy, 8088 không phản hồi)";
+  n.textContent = "Trạng thái: " + head + (v.last && String(v.last) !== "-" ? " | " + v.last : "");
 }
 function vpToggle() {
   var wantOff = VP.off !== 1;              // 现在不是省电 ⇒ 这一次点下去是要关
@@ -1961,9 +1910,9 @@ function vpToggle() {
     });
   };
   if (!wantOff) { return go(); }           // 开回来不用问
-  uiConfirm("关闭语音助手（省电模式）？\n\n音箱将不再唤醒、不再收音、断开小智服务器。\n"
-    + "网页端的电台 / 搜索 / 点播不受影响，随时可以再打开。", go,
-    { title: "关闭语音助手", ok: "关闭", danger: true });
+  uiConfirm("Tắt trợ lý giọng nói (tiết kiệm điện)?\n\nLoa sẽ không nhận từ đánh thức, không thu âm và ngắt kết nối máy chủ XiaoZhi.\n"
+    + "Đài phát thanh / phát nhạc trên web không bị ảnh hưởng và có thể bật lại bất cứ lúc nào.", go,
+    { title: "Tắt trợ lý giọng nói", ok: "Tắt", danger: true });
 }
 
 /* ---------- Tab ---------- */
@@ -2013,11 +1962,11 @@ function fillChain(a) {
   var el = $("chainNote");
   if (!el) return;
   var warn = [];
-  var src = a.uscTap ? "原厂四麦 tap（波束 + AGC + 硬件 AEC）" : "AudioRecord 直采";
-  if (!a.uscTap) warn.push("未走 tap，收音会明显变差");
-  if (a.aec) warn.push("软件 AEC 开着，实测会把人声一起消掉");
-  el.textContent = "采集链路：" + src + " · 软件 AEC " + (a.aec ? "开" : "关")
-    + (warn.length ? "　⚠ " + warn.join("；") : "");
+  var src = a.uscTap ? "4-mic HAL tap gốc (Beamforming + AGC + AEC phần cứng)" : "AudioRecord trực tiếp";
+  if (!a.uscTap) warn.push("Không dùng tap gốc, thu âm sẽ kém rõ rệt");
+  if (a.aec) warn.push("AEC phần mềm đang bật, có thể triệt nhầm giọng nói");
+  el.textContent = "Chuỗi thu âm: " + src + " · AEC phần mềm: " + (a.aec ? "Bật" : "Tắt")
+    + (warn.length ? "  ⚠ " + warn.join("; ") : "");
   el.style.color = warn.length ? "var(--warn)" : "";
 }
 
@@ -2047,7 +1996,7 @@ function tgAuto() {
 /* ---------- 音量（防误触：拖动→应用→3s 还原） ---------- */
 var volSetTs = 0;
 /* volApplied = 最后一次真生效的音量档位；volPending = 拖了还没应用 */
-var volApplied = -1, volPending = false, volTimer = null, volHintTxt = "系统音量";
+var volApplied = -1, volPending = false, volTimer = null, volHintTxt = "Âm lượng hệ thống";
 
 /* 拖动只改显示 + 进入待应用态；3s 不点「应用」自动还原 */
 function onVolDrag(val) {
@@ -2055,9 +2004,9 @@ function onVolDrag(val) {
   $("volV").textContent = val + " / " + mv;
   volPending = true;
   var b = $("volApply");
-  if (b) { b.classList.add("hot"); b.textContent = "应用 " + val; }
+  if (b) { b.classList.add("hot"); b.textContent = "Áp dụng " + val; }
   var h = $("volHint");
-  if (h) h.textContent = "待应用…";
+  if (h) h.textContent = "Chờ áp dụng…";
   if (volTimer) clearTimeout(volTimer);
   volTimer = setTimeout(volRevert, 3000);
 }
@@ -2070,7 +2019,7 @@ function volRevert() {
   el.value = back;
   $("volV").textContent = back + " / " + (el.max || 15);
   var b = $("volApply");
-  if (b) { b.classList.remove("hot"); b.textContent = "应用"; }
+  if (b) { b.classList.remove("hot"); b.textContent = "Áp dụng"; }
   $("volHint").textContent = volHintTxt;
 }
 /* 点「应用」：真正把音量发下去 */
@@ -2082,7 +2031,7 @@ function volApply() {
   volApplied = val;
   volSetTs = Date.now();
   var b = $("volApply");
-  if (b) { b.classList.remove("hot"); b.textContent = "应用"; }
+  if (b) { b.classList.remove("hot"); b.textContent = "Áp dụng"; }
   volSend(val);
 }
 /* 真正生效的发送逻辑（原 onVol） */
@@ -2106,7 +2055,7 @@ function volSend(val) {
     // 自己的音量（那个必须走 8080 的 set_vol，原厂没有）。
     // pl-1.1.1：player 侧服务端会把百分比换算回档位再写系统流，直接回显它的结果
     // （例如「OK 音量 3/15」），比自己再算一遍百分比不容易误解。
-    toast("已设系统音乐流 " + pct + "%（" + val + "/" + mv + " 档）" + (S.pl ? " —— 由 player 落地" : ""));
+    toast("Đã đặt âm lượng hệ thống " + pct + "% (" + val + "/" + mv + ")");
   });
 }
 
@@ -2256,13 +2205,12 @@ function renderFav() {
   }
   if (hint) {
     hint.textContent = FAVS.length
-      ? ("共 " + FAVS.length + " 首" + (nMiss ? (" · " + nMiss + " 首自动没配上（红底，点它重链接）") : "")
-         + " · 点歌名播这一首，✕ 取消收藏 · 长按歌名可重链接")
-      : "点 ☆ 收藏";
+      ? ("Tổng " + FAVS.length + " bài" + (nMiss ? (" · " + nMiss + " bài chưa khớp nguồn (nền đỏ)") : "")
+         + " · Chạm để phát, ✕ để xóa · Nhấn giữ để liên kết lại")
+      : "Chạm ☆ để lưu";
   }
   if (!FAVS.length) {
-    box.innerHTML = '<div class="note" style="margin:0">还没有收藏 —— 在播放页点标题右边的 ☆，'
-      + '或在下面的搜索结果、播放队列里点 ☆ 就能收进来</div>';
+    box.innerHTML = '<div class="note" style="margin:0">Chưa có bài yêu thích — chạm biểu tượng ☆ ở trang Phát nhạc, kết quả tìm kiếm hoặc danh sách phát để lưu</div>';
     return;
   }
   box.innerHTML = FAVS.map(function (it, i) {
@@ -2271,7 +2219,7 @@ function renderFav() {
     if (sa) sub.push(sa);
     /* ★ pl-1.6.101：有声书标记 —— kind=program 的条目在副行亮 📖（上传歌单时
        device 按标题/专辑自动识别，或导出 txt 的 kind=program 列带回）。 */
-    if (it.kind === "program") sub.push("📖 有声书");
+    if (it.kind === "program") sub.push("📖 Sách nói");
     if (it.album) sub.push(it.album);
     if (it.duration) sub.push(it.duration);
     /* ★ pl-1.6.74：重链接模式 —— 长按过的这一条**标红**（跟「没配上」同一个样式），
@@ -2287,8 +2235,8 @@ function renderFav() {
         + '<div class="n">' + (i + 1) + "</div>"
         + '<div class="tx"><div class="a">' + esc(favShowT(it)) + "</div>"
         + '<div class="b">' + esc(sub.join(" · ") || " ") + (rlMarked(favShowT(it), favShowA(it))
-            ? " · 重链接模式：点这一行去在线挑一版，✕ 退出"
-            : " · 自动没配上，点这一行去在线挑一版，✕ 忽略") + "</div></div>"
+            ? " · Liên kết lại: chạm để chọn bản online, ✕ để thoát"
+            : " · Chưa khớp nguồn: chạm để chọn bản online, ✕ để ẩn") + "</div></div>"
         + '<div class="fix" onclick="event.stopPropagation();rlOpenFav(' + i + ')">🔗</div>'
         /* ★ pl-1.6.74：重链接模式下的 ✕ **退出模式**，不删收藏 ——
            红色那一行点错就丢一首歌太危险（用户明确要求）。
@@ -2330,7 +2278,7 @@ function favAutoMiss(it) {
 }
 /* 收藏 / 取消收藏（一条 op 搞定：有就删、没有就加） */
 function favToggle(o) {
-  if (!o || !o.title) { toast("这首没有歌名，收藏不了"); return; }
+  if (!o || !o.title) { toast("Bài này không có tên, không thể lưu"); return; }
   if (DEMO) { favDemoToggle(o); return; }        // 演示模式：本地增删，不真发请求
   var p = "title=" + encodeURIComponent(o.title)
     + "&artist=" + encodeURIComponent(o.artist || "");
@@ -2355,14 +2303,14 @@ function favDemoToggle(o) {
   }
   if (hit >= 0) {
     FAVS.splice(hit, 1);
-    toast("[演示] 已取消收藏《" + o.title + "》");
+    toast("[Demo] Đã bỏ yêu thích " + o.title);
   } else {
     FAVS.push({
       title: o.title, artist: o.artist || "", url: o.url || "",
       index: o.index || 0, source: o.source || "", rid: o.rid || "",
       album: o.album || "", duration: o.duration || ""
     });
-    toast("[演示] 已收藏《" + o.title + "》");
+    toast("[Demo] Đã thêm yêu thích " + o.title);
   }
   favReindex();
   renderFav(); renderQueue(true);
@@ -2371,7 +2319,7 @@ function favDemoToggle(o) {
 }
 function favToggleCur() {
   var t = (MI && MI.title) ? MI.title : "";
-  if (!t) { toast("现在没在播，没有可收藏的歌"); return; }
+  if (!t) { toast("Hiện không có bài nào đang phát"); return; }
   /* ★ v1.3.288：在播的是有声书/节目 ⇒ 收「这本书」到我的节目（不是收歌） */
   if (npIsProgram()) { ebFavCur(); return; }
   favToggle({ title: t, artist: (MI && MI.artist) || "", url: CURURL || "" });
@@ -2436,7 +2384,7 @@ function qFindFav(it) {
 }
 /* 跳到队列里的那一首（绝对下标 0-based）—— 队列顺序长度都不动 */
 function playFavAt(at) {
-  toast("播放列表里已有这首 —— 直接跳过去播");
+  toast("Bài hát đã có trong hàng đợi — chuyển tới ngay");
   act("play_at", "index=" + (at + 1));
   setTimeout(function () { loadQueue(); load(); }, 1200);
 }
@@ -2475,12 +2423,12 @@ function favDelAsk(i) {
   var ov = document.createElement("div");
   ov.id = "delOv"; ov.className = "modal-ov";
   ov.innerHTML = '<div class="modal" style="width:360px">'
-    + '<div class="modal-t">取消收藏？</div>'
+    + '<div class="modal-t">Bỏ yêu thích?</div>'
     + '<div class="modal-b">《' + esc(favShowT(it)) + "》"
     + (favShowA(it) ? ("&#8201;－&#8201;" + esc(favShowA(it))) : "") + "<br>"
-    + '会从<b>收藏</b>里删掉（当前播放列表不受影响）。</div>'
-    + '<div class="modal-foot"><button class="btn" onclick="favDelClose()">取消</button>'
-    + '<button class="btn dgr" onclick="favDelOk()">删除</button></div></div>';
+    + ' sẽ bị xóa khỏi danh sách <b>Yêu thích</b> (hàng đợi hiện tại không đổi).</div>'
+    + '<div class="modal-foot"><button class="btn" onclick="favDelClose()">Hủy</button>'
+    + '<button class="btn dgr" onclick="favDelOk()">Xóa</button></div></div>';
   document.body.appendChild(ov);
 }
 function favDelClose() {
@@ -2512,11 +2460,11 @@ function rlToggle(t, a, redraw) {
   if (RLM[k]) {
     delete RLM[k];
     delete RLHIDE[k];
-    toast("已退出重链接模式");
+    toast("Đã thoát chế độ liên kết lại");
   } else {
     delete RLHIDE[k];
     RLM[k] = 1;
-    toast("重链接模式：《" + t + "》—— 点这一行（或右边的 🔗）在线挑一版；再长按一次退出");
+    toast("Liên kết lại: " + t + " — chạm dòng này (hoặc 🔗) để chọn bản online");
   }
   redraw();
 }
@@ -2528,10 +2476,10 @@ function rlIgnore(t, a, n, redraw) {
   var k = rlKey(t, a);
   if (RLM[k]) {
     delete RLM[k];
-    toast("已退出重链接模式");
+    toast("Đã thoát chế độ liên kết lại");
   } else {
     RLHIDE[k] = n || 0;
-    toast("已忽略红标（条目不动；再播一次若还是没源，会自动重新标红）");
+    toast("Đã ẩn cảnh báo đỏ");
   }
   redraw();
 }
@@ -2581,7 +2529,7 @@ function rlOpenQ(i) {
   openRelink({ k: favKey(t, a), title: t, artist: a, src: "", rid: "", cur: !!cur });
 }
 function openRelink(o) {
-  if (DEMO) { toast("演示模式不支持重链接"); return; }
+  if (DEMO) { toast("Chế độ demo không hỗ trợ liên kết lại"); return; }
   if (document.getElementById("rlOv")) { rlClose(); }
   RL.k = o.k || favKey(o.title, o.artist);
   RL.title = o.title || "";
@@ -2591,14 +2539,14 @@ function openRelink(o) {
   var ov = document.createElement("div");
   ov.id = "rlOv"; ov.className = "modal-ov";
   ov.innerHTML = '<div class="modal">'
-    + '<div class="modal-t">重链接：' + esc(RL.title) + "</div>"
-    + '<div class="modal-b">在下面挑一版 —— 点它就<b>永久</b>把这首歌绑到那一版'
-    + (RL.cur ? "（这首正在播 ⇒ 绑完立刻换过来重放）" : "") + "。"
-    + '<br><span style="opacity:.7">▶ 是试听，不绑定；🔗 或点整行才是绑定。</span></div>'
+    + '<div class="modal-t">Liên kết lại: ' + esc(RL.title) + "</div>"
+    + '<div class="modal-b">Chọn một bản bên dưới để gắn cố định cho bài hát này'
+    + (RL.cur ? " (đang phát ⇒ sẽ phát lại ngay sau khi gắn)" : "") + "."
+    + '<br><span style="opacity:.7">▶ Nghe thử · 🔗 hoặc chạm cả dòng để gắn.</span></div>'
     + '<div class="rl-row"><input id="rlQ" class="rl-in" type="search" '
-    + 'placeholder="歌名 歌手（可改）"><button class="btn pri" onclick="rlGo()">搜索</button></div>'
-    + '<div id="rlRes" class="rl-res"><div class="note" style="margin:0">搜索中…</div></div>'
-    + '<div class="modal-foot"><button class="btn" onclick="rlClose()">取消</button></div>'
+    + 'placeholder="Tên bài hát / ca sĩ"><button class="btn pri" onclick="rlGo()">Tìm</button></div>'
+    + '<div id="rlRes" class="rl-res"><div class="note" style="margin:0">Đang tìm…</div></div>'
+    + '<div class="modal-foot"><button class="btn" onclick="rlClose()">Hủy</button></div>'
     + "</div>";
   document.body.appendChild(ov);
   var inp = document.getElementById("rlQ");
@@ -2622,14 +2570,14 @@ function rlGo() {
   var box = document.getElementById("rlRes");
   var inp = document.getElementById("rlQ");
   var q = (inp && inp.value ? inp.value : RL.title).replace(/^\s+|\s+$/g, "");
-  if (!q) { toast("先输个歌名再搜"); return; }
-  if (box) { box.innerHTML = '<div class="note" style="margin:0">搜索中…（在线要跑跨源取链，慢一点）</div>'; }
+  if (!q) { toast("Hãy nhập tên bài hát trước"); return; }
+  if (box) { box.innerHTML = '<div class="note" style="margin:0">Đang tìm nguồn online…</div>'; }
   fetch("/api/search?k=" + encodeURIComponent(q) + "&online=1&olimit=30")
     .then(function (r) { return r.json(); })
     .then(function (o) { rlRender(o); })
     .catch(function (e) {
       var b2 = document.getElementById("rlRes");
-      if (b2) { b2.innerHTML = '<div class="note" style="margin:0">搜索失败：' + esc(String(e)) + "</div>"; }
+      if (b2) { b2.innerHTML = '<div class="note" style="margin:0">Tìm kiếm thất bại: ' + esc(String(e)) + "</div>"; }
     });
 }
 function rlRender(o) {
@@ -2638,8 +2586,7 @@ function rlRender(o) {
   var ol = (o && o.online && o.online.list) ? o.online.list : [];
   RL.res = ol;
   if (!ol.length) {
-    box.innerHTML = '<div class="note" style="margin:0">在线没搜到 —— 换个更具体的词'
-      + '（歌名 + 歌手）再搜一次；实在没有就说明 NAS 那几路源里没这一版。</div>';
+    box.innerHTML = '<div class="note" style="margin:0">Không tìm thấy online — thử nhập từ khóa cụ thể hơn (Tên bài + Ca sĩ).</div>';
     return;
   }
   box.innerHTML = ol.map(function (it, j) {
@@ -2649,7 +2596,7 @@ function rlRender(o) {
     if (it.album) { sub.push(it.album); }
     if (it.duration) { sub.push(it.duration); }
     if (it.source) { sub.push(it.source + "/" + (it.rid || "")); }
-    if (mine) { sub.push("当前绑定"); }
+    if (mine) { sub.push("Đang gắn"); }
     return '<div class="li' + (mine ? " cur" : "") + '" onclick="rlBind(' + j + ')">'
       + '<div class="n" onclick="event.stopPropagation();rlTry(' + j + ')">▶</div>'
       + '<div class="tx"><div class="a">' + esc(it.title || "") + "</div>"
@@ -2671,9 +2618,9 @@ function rlTry(j) {
 /* 绑定：把这歌永久指到这一版（device op=fav_link，双登记过） */
 function rlBind(j) {
   var it = RL.res[j]; if (!it) return;
-  if (!it.source || !it.rid) { toast("这一条没有可绑的版本信息（缺 source/rid）"); return; }
+  if (!it.source || !it.rid) { toast("Mục này thiếu thông tin nguồn (source/rid)"); return; }
   var box = document.getElementById("rlRes");
-  if (box) { box.innerHTML = '<div class="note" style="margin:0">正在绑定…</div>'; }
+  if (box) { box.innerHTML = '<div class="note" style="margin:0">Đang liên kết…</div>'; }
   var p = "k=" + encodeURIComponent(RL.k)
     + "&title=" + encodeURIComponent(RL.title)
     + "&artist=" + encodeURIComponent(RL.artist)
@@ -2689,9 +2636,9 @@ function rlBind(j) {
        ⇒ 随后拉回来的真值也是白的，两边一致。 */
     rlClearMarks(rlKey(RL.title, RL.artist), RL.title, RL.artist);
     rlClose();
-    toast((r && r.msg) ? r.msg : "已重链接");
+    toast((r && r.msg) ? r.msg : "Đã liên kết lại");
     setTimeout(function () { loadFav(1); loadQueue(); }, 700);
-  }).catch(function () { toast("绑定失败：先确认小智还在跑"); });
+  }).catch(function () { toast("Liên kết thất bại: kiểm tra XiaoZhi có đang chạy không"); });
 }
 /* 绑定成功 ⇒ 把这一首的红标从**页面状态**里彻底抹掉（乐观更新）。
    要清四份：RLM（长按进来的模式）/ RLHIDE（忽略集合）/ FAVMISS（导入返回的名单）/
@@ -2786,19 +2733,19 @@ document.addEventListener("click", function (e) {
    play_fav 回传末尾会附 "###MISSED###" + 每行一首真正没匹配上的歌名；
    解析出来 → 收藏列表里红底标注 + 弹「导入情况」对话框（带确认按钮）。 */
 function favPlay() {
-  if (!FAVS.length) { toast("收藏列表是空的 —— 先点几颗 ☆"); return; }
+  if (!FAVS.length) { toast("Danh sách yêu thích đang trống"); return; }
   /* 光杆条目（只存了歌名的）要在线补源，整批下来可能十几秒 ⇒ 按钮当场置灰，
      不然用户以为点了没反应会连点。 */
   var b = $("btnFavPlay");
-  if (b) { b.disabled = true; b.textContent = "导入中…（缺地址的要在网上搜，请稍候）"; }
+  if (b) { b.disabled = true; b.textContent = "Đang nạp vào hàng đợi…"; }
   var back = function () {
-    if (b) { b.disabled = false; b.textContent = "导入播放列表并播放"; }
+    if (b) { b.disabled = false; b.textContent = "Nạp vào hàng đợi & phát"; }
   };
   FAVMISS = {};                                   // 每次重新判定，不累积旧标记
   act("fav_play", null, true).then(function (r) {
     back();
     setTimeout(loadQueue, 1500);
-    var msg = (r && r.msg) ? r.msg : "已导入播放列表";
+    var msg = (r && r.msg) ? r.msg : "Đã nạp danh sách phát";
     var missed = [];
     var sep = msg.indexOf("###MISSED###");
     if (sep >= 0) {
@@ -2815,55 +2762,55 @@ function favPlay() {
   }, function () { back(); });
 }
 function favClear() {
-  if (!FAVS.length) { toast("收藏列表本来就是空的"); return; }
-  uiConfirm("清空收藏列表（" + FAVS.length + " 首）？\n\n"
-    + "列表会整条清空；之前导出的 txt 还能再导回来。", function () {
-    if (DEMO) { FAVS = []; favReindex(); renderFav(); renderQueue(true); if (LASTQ) renderSearch(LASTQ); paintFavCur(); toast("[演示] 收藏已清空"); return; }
+  if (!FAVS.length) { toast("Danh sách yêu thích vốn đã trống"); return; }
+  uiConfirm("Xóa sạch danh sách yêu thích (" + FAVS.length + " bài)?\n\n"
+    + "Bạn vẫn có thể nhập lại từ file txt đã sao lưu trước đó.", function () {
+    if (DEMO) { FAVS = []; favReindex(); renderFav(); renderQueue(true); if (LASTQ) renderSearch(LASTQ); paintFavCur(); toast("[Demo] Đã xóa yêu thích"); return; }
     act("fav_clear");
     setTimeout(function () { loadFav(1); }, 600);
-  }, { title: "清空收藏", ok: "清空", danger: true });
+  }, { title: "Xóa yêu thích", ok: "Xóa hết", danger: true });
 }
 /* pl-1.6.62：备份歌单（导出）/ 上传歌单（导入，txt 格式，记事本可编辑）。
    导出直接下载 /api/fav/export（text/plain + Content-Disposition）；
    导入把选中的 txt 原样 POST 到 /api/fav/import，由后端解析。 */
 function favExport() {
-  if (DEMO) { toast("[演示] 无导出"); return; }
+  if (DEMO) { toast("[Demo] Không xuất file"); return; }
   var a = document.createElement("a");
   a.href = "/api/fav/export";
   a.download = "r1_fav.txt";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  toast("已导出收藏（txt，含配对信息），可用记事本编辑歌单");
+  toast("Đã xuất danh sách yêu thích (.txt)");
 }
 function favImportFile(input) {
   var f = input.files && input.files[0];
   if (!f) return;
-  if (DEMO) { toast("[演示] 无导入"); input.value = ""; return; }
+  if (DEMO) { toast("[Demo] Không nhập file"); input.value = ""; return; }
   var btn = $("btnFavImport");
   var setBusy = function (on, txt) {
     if (!btn) return;
     btn.disabled = on;
-    btn.textContent = txt || (on ? "上传中…" : "上传歌单");
+    btn.textContent = txt || (on ? "Đang tải lên…" : "Tải lên danh sách");
   };
   var reader = new FileReader();
   reader.onload = function () {
     var body = reader.result;
-    setBusy(true, "上传中…");
+    setBusy(true, "Đang tải lên…");
     fetch("/api/fav/import", {
       method: "POST",
       headers: { "Content-Type": "text/plain; charset=utf-8" },
       body: body
     }).then(function (r) { return r.json(); }).then(function (r) {
       if (!r || !r.ok) {
-        setBusy(false, "上传歌单");
-        toast((r && r.msg) ? r.msg : "导入失败");
+        setBusy(false, "Tải lên danh sách");
+        toast((r && r.msg) ? r.msg : "Nhập thất bại");
         input.value = "";
         return;
       }
-      toast("导入已启动，后台处理中…");
+      toast("Đang xử lý nhập danh sách ở nền…");
       favImportPoll(btn, input, setBusy);
-    }).catch(function () { setBusy(false, "上传歌单"); toast("导入请求失败"); input.value = ""; });
+    }).catch(function () { setBusy(false, "Tải lên danh sách"); toast("Yêu cầu nhập thất bại"); input.value = ""; });
   };
   reader.readAsText(f, "UTF-8");
   input.value = "";     // 允许重复选同一个文件
@@ -2876,17 +2823,17 @@ function favImportPoll(btn, input, setBusy) {
       if (s && s.importing) {
         var p = s.total ? Math.round(100 * (s.done || 0) / s.total) : 0;
         btn.disabled = true;
-        btn.textContent = "导入中 " + (s.done || 0) + "/" + (s.total || 0) + " " + p + "%";
+        btn.textContent = "Đang nhập " + (s.done || 0) + "/" + (s.total || 0) + " " + p + "%";
         setTimeout(tick, 1000);
       } else {
-        setBusy(false, "上传歌单");
+        setBusy(false, "Tải lên danh sách");
         var m = (s && s.msg) ? s.msg : "";
-        toast(m.indexOf("OK") >= 0 ? m : ("导入结束：" + m));
+        toast(m.indexOf("OK") >= 0 ? m : ("Hoàn tất nhập: " + m));
         if (input) input.value = "";
         setTimeout(loadFav, 800);
       }
     }).catch(function () {
-      setBusy(false, "上传歌单");
+      setBusy(false, "Tải lên danh sách");
       if (input) input.value = "";
       setTimeout(loadFav, 1200);
     });
@@ -2899,14 +2846,14 @@ function showFavImportResult(msg, missed) {
   var ov = document.createElement("div");
   ov.id = "favResultModal"; ov.className = "modal-ov";
   var html = '<div class="modal">'
-    + '<div class="modal-t">导入情况</div>'
+    + '<div class="modal-t">Kết quả nhập</div>'
     + '<div class="modal-b">' + esc(msg).replace(/\n/g, "<br>") + '</div>';
   if (missed && missed.length) {
-    html += '<div class="modal-sub">以下 ' + missed.length + ' 首没匹配上（已在收藏列表红底标注）：</div>'
+    html += '<div class="modal-sub">' + missed.length + ' bài chưa khớp nguồn (đã đánh dấu đỏ):</div>'
           + '<div class="modal-list">' + missed.map(function (t) {
               return '<div class="modal-li">' + esc(t) + '</div>'; }).join("") + '</div>';
   }
-  html += '<div class="modal-foot"><button class="btn pri" onclick="closeFavResult()">确认</button></div></div>';
+  html += '<div class="modal-foot"><button class="btn pri" onclick="closeFavResult()">Đóng</button></div></div>';
   ov.innerHTML = html;
   ov.onclick = function (e) { if (e.target === ov) closeFavResult(); };
   document.body.appendChild(ov);
@@ -2934,7 +2881,7 @@ function doSearch(ol, rnd) {
   var k = v("qKey").trim();
   // ★ 关键词留空 = 列全部曲库（服务端 matchTracks 遇到空串返回全部）
   var box = $("qRes");
-  box.innerHTML = '<div class="note" style="margin:0">搜索中…</div>';
+  box.innerHTML = '<div class="note" style="margin:0">Đang tìm…</div>';
   if (DEMO) {
     renderSearch({
       total: 2,
@@ -2955,7 +2902,7 @@ function doSearch(ol, rnd) {
     .then(function (r) { return r.json(); })
     .then(function (o) { renderSearch(o); })
     .catch(function (e) {
-      box.innerHTML = '<div class="note" style="margin:0">搜索失败：' + esc(String(e)) + "</div>";
+      box.innerHTML = '<div class="note" style="margin:0">Tìm kiếm thất bại: ' + esc(String(e)) + "</div>";
     });
 }
 
@@ -2978,9 +2925,9 @@ function renderSearch(o) {
     var isRnd = !!o.online.random;
     html += '<div class="note" style="margin:0 0 4px;color:var(--ac)">'
       + (isRnd
-        ? ("在线随机 " + ont + " 首（每次都是新的一批；点 ▶ 播它，并把这一整批排进播放列表）")
-        : ("在线搜到 " + ont + " 首" + (ont > ol.length ? "，列前 " + ol.length : "")
-           + "（NAS 全源，点 ▶ 播放）"))
+        ? ("Ngẫu nhiên online " + ont + " bài (chạm ▶ để phát cả danh sách)")
+        : ("Tìm thấy online " + ont + " bài" + (ont > ol.length ? ", hiện " + ol.length + " bài đầu" : "")
+           + " (chạm ▶ để phát)"))
       + "</div>";
     html += ol.map(function (it, j) {
       var go = (it.ri === 0 || it.ri > 0) ? ("playRandAt(" + j + ")") : ("playOnlineRes(" + j + ")");
@@ -2996,8 +2943,8 @@ function renderSearch(o) {
         + "</div>";
     }).join("");
     if (list.length && !isRnd) {
-      html += '<div class="note" style="margin:10px 0 4px">下面是曲库池里的 '
-        + list.length + " 首</div>";
+      html += '<div class="note" style="margin:10px 0 4px">Kho nhạc nội bộ: '
+        + list.length + " bài</div>";
     }
   }
   if (list.length) {
@@ -3011,16 +2958,16 @@ function renderSearch(o) {
         + "</div>";
     }).join("");
     if (o.total > list.length) {
-      html += '<div class="note" style="margin:8px 0 0">共 ' + o.total + " 首，只列前 "
-        + list.length + " 首（换个更具体的词再搜）</div>";
+      html += '<div class="note" style="margin:8px 0 0">Tổng ' + o.total + " bài, hiện "
+        + list.length + " bài đầu (nhập từ khóa cụ thể hơn)</div>";
     }
   } else if (!ol.length) {
     html += '<div class="note" style="margin:0">'
       + ((o.online && o.online.random)
-        ? "在线曲库暂时拉不到（NAS mini-lx 起了吗？音乐源配了吗？）"
+        ? "Không tải được kho nhạc online (kiểm tra nguồn nhạc NAS)"
         /* ★ pl-1.6.15：「搜索」只搜本地（在线听过的歌不再混进曲库）——
            本地库关着/为空时这里就是 0，必须把出路写清楚，别让用户以为坏了 */
-        : "曲库里没找到 —— 这里的搜索只搜本地曲库；想听在线的请点「在线搜歌」")
+        : "Không tìm thấy trong kho nội bộ — hãy bấm «Tìm online»")
       + "</div>";
   }
   box.innerHTML = html;
@@ -3110,7 +3057,7 @@ function qFindSame(title, artist, k, src, rid) {
 function playInQueueOr(title, artist, fallback) {
   var at = qFindSong(title, artist);
   if (at < 0) { fallback(); return false; }
-  toast("播放列表里已有这首 —— 直接跳过去播");
+  toast("Bài hát đã có trong hàng đợi — chuyển tới ngay");
   act("play_at", "index=" + (at + 1));
   setTimeout(function () { loadQueue(); load(); }, 1200);
   return true;
@@ -3152,7 +3099,7 @@ function playRes(i) {
   // music_info.title 传不过去，界面上就看不到歌名。
   if (it.index) { act("play_index", "index=" + it.index); return; }
   var key = it.url || it.title || "";
-  if (!key) { toast("这条没有可播地址"); return; }
+  if (!key) { toast("Mục này không có đường dẫn phát"); return; }
   // 兜底：只有 url 没有曲库序号时才走 play_url，此时把歌名一起带过去
   // （后端以前死写「网络音频」，player 的 music_info.title 就成了「网络音频」）。
   var q = "url=" + encodeURIComponent(key);
@@ -3205,7 +3152,7 @@ function queueAll() {
     });
   };
   if (!ids.length) {
-    uiConfirm("还没有搜索结果，要载入整个曲库吗？", goAll, { ok: "载入" });
+    uiConfirm("Chưa có kết quả tìm kiếm, nạp toàn bộ kho nhạc?", goAll, { ok: "Nạp" });
     return;
   }
   goAll();
@@ -3234,7 +3181,7 @@ function renderRadios() {
 
   if (!RADIOS.length) {
     hint.textContent = "";
-    box.innerHTML = '<div class="note" style="margin:0">音乐源未加载或不含电台</div>';
+    box.innerHTML = '<div class="note" style="margin:0">Chưa tải nguồn nhạc hoặc không có đài phát thanh</div>';
     return;
   }
 
@@ -3245,10 +3192,10 @@ function renderRadios() {
   }
   // 序号保留「在完整名单里的位置」，不随过滤重排（台序是固定的，序号就是它的标识）
   hint.textContent = radioFilt
-    ? ("匹配 " + shown.length + " / " + RADIOS.length + " 个台")
-    : (RADIOS.length + " 个台 · 点一下收听" + (RADIOS.length > 5 ? "（可上下滑）" : ""));
+    ? ("Khớp " + shown.length + " / " + RADIOS.length + " đài")
+    : (RADIOS.length + " đài · chạm để nghe" + (RADIOS.length > 5 ? " (cuộn xem thêm)" : ""));
   if (!shown.length) {
-    box.innerHTML = '<div class="note" style="margin:0">没有台名含「' + esc(radioFilt) + '」的电台</div>';
+    box.innerHTML = '<div class="note" style="margin:0">Không có đài chứa «' + esc(radioFilt) + '»</div>';
     return;
   }
   box.innerHTML = shown.map(function (o) {
@@ -3260,7 +3207,7 @@ function renderRadios() {
     return '<div class="li rad" onclick="playRadioAt(' + o.i + ', this)">'
       + '<div class="n">' + (o.i + 1) + "</div>"
       + '<div class="tx"><div class="a">' + esc(o.nm) + "</div>"
-      + '<div class="b">网络直播</div></div></div>';
+      + '<div class="b">Phát trực tiếp</div></div></div>';
   }).join("");
 }
 /* ★ pl-1.6.27：点一下闪一下（200ms）—— 取流要 1~2 秒，中间没有反馈会以为没点到 */
@@ -3277,7 +3224,7 @@ function playRadio(n) {
   if (!n) return;
   /* curRadio 只是记账（语音换台时用来比对），不再驱动列表高亮 */
   curRadio = n;
-  toast("正在切到「" + n + "」…");
+  toast("Đang chuyển sang «" + n + "»…");
   act("radio", "name=" + encodeURIComponent(n));
 }
 
@@ -3287,9 +3234,9 @@ function setKV2(o) {
   var b = [];
   for (var k in o) if (o.hasOwnProperty(k)) b.push(k + "=" + encodeURIComponent(o[k]));
   return post("/api/set", b.join("&")).then(function (r) {
-    toast((r && r.msg) ? r.msg : "已保存");
+    toast((r && r.msg) ? r.msg : "Đã lưu");
     load();
-  }).catch(function () { toast("保存失败"); });
+  }).catch(function () { toast("Lưu thất bại"); });
 }
 function useOfficial() { $("inOta").value = ""; $("inWs").value = ""; $("inToken").value = ""; saveServer(); }
 function saveIndex() { setKV2({ musicIndex: v("inIdx") }); }
@@ -3322,7 +3269,7 @@ function alHm(it) { return alPad(it.h || 0) + ":" + alPad(it.m || 0); }
 function alEsc(x) { return esc(x == null ? "" : ("" + x)); }
 function alSongText(it) {
   var s = it && it.song;
-  if (!s || !s.title) return "随机一首";
+  if (!s || !s.title) return "Ngẫu nhiên 1 bài";
   return "《" + s.title + "》" + (s.artist || "");
 }
 function alRepChange() {
@@ -3344,12 +3291,12 @@ function alDaysStr() {
 function alAct(op, extra) {
   return post("/api/act", "op=" + encodeURIComponent(op) + (extra ? "&" + extra : ""))
     .then(function (r) {
-      var m = (r && r.msg) ? ("" + r.msg) : "已执行";
+      var m = (r && r.msg) ? ("" + r.msg) : "Đã thực hiện";
       toast(m.replace(/^OK\s*/, ""));
       setTimeout(loadAlarm, 500);
       return r;
     })
-    .catch(function () { toast("请求失败"); });
+    .catch(function () { toast("Yêu cầu thất bại"); });
 }
 
 /* ★ pl-1.6.89：闹钟音量也走「拖动 → 应用 → 3 秒还原」——
@@ -3362,7 +3309,7 @@ function alVolDrag(v) {
   $("alVolV").textContent = n + "%";
   alVolPending = true;
   var b = $("alVolApply");
-  if (b) { b.classList.add("hot"); b.textContent = "应用 " + n + "%"; }
+  if (b) { b.classList.add("hot"); b.textContent = "Áp dụng " + n + "%"; }
   if (alVolTimer) clearTimeout(alVolTimer);
   alVolTimer = setTimeout(alVolRevert, 3000);
 }
@@ -3376,7 +3323,7 @@ function alVolRevert() {
   el.value = back;
   $("alVolV").textContent = back + "%";
   var b = $("alVolApply");
-  if (b) { b.classList.remove("hot"); b.textContent = "应用"; }
+  if (b) { b.classList.remove("hot"); b.textContent = "Áp dụng"; }
 }
 
 function alVolApply() {
@@ -3384,10 +3331,10 @@ function alVolApply() {
   alVolPending = false;
   var n = parseInt($("alVol").value, 10);
   var b = $("alVolApply");
-  if (b) { b.classList.remove("hot"); b.textContent = "应用"; }
+  if (b) { b.classList.remove("hot"); b.textContent = "Áp dụng"; }
   if (!(n >= 20 && n <= 100)) {
     $("alVol").value = alVolApplied >= 0 ? alVolApplied : 50;
-    toast("音量要在 20~100 之间");
+    toast("Âm lượng phải từ 20 đến 100");
     return;
   }
   alVolApplied = n;
@@ -3396,7 +3343,7 @@ function alVolApply() {
 
 function alVolSet(v) {
   var n = parseInt(v, 10);
-  if (!(n >= 20 && n <= 100)) { toast("音量要在 20~100 之间"); return; }
+  if (!(n >= 20 && n <= 100)) { toast("Âm lượng phải từ 20 đến 100"); return; }
   alAct("alarm_vol", "v=" + n);
 }
 
@@ -3412,10 +3359,9 @@ function alLoadCache(cb) {
   }).catch(function () { if (cb) cb(); });
 }
 function alCacheClear() {
-  uiConfirm("清空设备上的铃声缓存？\n\n清掉后指定的歌要联网才能放到；"
-    + "收藏和闹钟设置都不受影响。",
+  uiConfirm("Xóa bộ nhớ đệm nhạc chuông trên thiết bị?\n\nDanh sách yêu thích và lịch báo thức không bị ảnh hưởng.",
     function () { alAct("alarm_cache", "clear=1"); },
-    { title: "清空铃声缓存", ok: "清空", danger: true });
+    { title: "Xóa bộ nhớ đệm", ok: "Xóa hết", danger: true });
 }
 /* v1.3.251：点「铃声缓存」那一行 => 展开/收起已缓存清单 */
 function alCacheToggle() {
@@ -3429,8 +3375,7 @@ function alRenderCache() {
   if (!el || el.style.display === "none") return;
   var cl = ALCACHE || [];
   if (!cl.length) {
-    el.innerHTML = '<div class="note" style="margin:0">还没有缓存的铃声。在曲库搜索里长按一首歌，'
-      + '或在「选择」里挑一首，就会自动存到这里并生效。</div>';
+    el.innerHTML = '<div class="note" style="margin:0">Chưa có nhạc chuông lưu sẵn. Hãy chọn một bài trong nút «Chọn».</div>';
     return;
   }
   el.innerHTML = cl.map(function (c, i) {
@@ -3438,7 +3383,7 @@ function alRenderCache() {
     return '<div class="li" onclick="alCacheSet(' + i + ')">'
       + '<div class="n">' + (i + 1) + '</div>'
       + '<div class="tx"><div class="a">' + alEsc(c.title) + '</div>'
-      + '<div class="b">' + alEsc(c.artist || "") + " · 本地文件" + mb + '</div></div>'
+      + '<div class="b">' + alEsc(c.artist || "") + " · Tệp nội bộ" + mb + '</div></div>'
       /* ★ pl-1.6.88：行尾 ✕ 只删这一首的缓存（要确认），点行本身仍然是「设为铃声」 */
       + '<div class="del" onclick="event.stopPropagation();alCacheDel(' + i + ')">✕</div>'
       + '</div>';
@@ -3448,27 +3393,26 @@ function alRenderCache() {
 function alCacheDel(i) {
   var c = (ALCACHE || [])[i];
   if (!c) return;
-  uiConfirm("删除《" + (c.title || "") + "》" + (c.artist || "") + " 的铃声缓存？\n\n"
-    + "只删设备上这一个音频文件，收藏和闹钟设置都不受影响。\n"
-    + "删掉之后轮到它响铃时要联网才能取到歌。",
+  uiConfirm("Xóa file nhạc chuông " + (c.title || "") + " " + (c.artist || "") + "?\n\n"
+    + "Chỉ xóa tệp âm thanh lưu tạm, không ảnh hưởng báo thức.",
     function () {
       alAct("alarm_cache", "del=" + encodeURIComponent(c.k || ""));
     },
-    { title: "删除铃声缓存", ok: "删除", danger: true });
+    { title: "Xóa nhạc chuông", ok: "Xóa", danger: true });
 }
 /* 点已缓存的铃声 => 设成默认铃声（本地已有文件，秒生效） */
 function alCacheSet(i) {
   var c = (ALCACHE || [])[i];
   if (!c) return;
-  uiConfirm("把《" + (c.title || "") + "》" + (c.artist || "")
-    + " 设为闹钟铃声？\n（之后新建的闹钟都用它）", function () {
+  uiConfirm("Đặt " + (c.title || "") + " " + (c.artist || "")
+    + " làm nhạc chuông báo thức mặc định?", function () {
     ALSONG = { k: c.k || "", title: c.title || "", artist: c.artist || "" };
     var e = $("alSongPick");
-    if (e) e.textContent = "《" + (c.title || "") + "》" + (c.artist || "") + "（已记住）";
+    if (e) e.textContent = (c.title || "") + (c.artist ? " - " + c.artist : "") + " (đã lưu)";
     alAct("alarm_song", "id=next&k=" + encodeURIComponent(c.k || "")
       + "&title=" + encodeURIComponent(c.title || "")
       + "&artist=" + encodeURIComponent(c.artist || ""));
-  }, { title: "设为铃声", ok: "就用它" });
+  }, { title: "Đặt làm nhạc chuông", ok: "Chọn bài này" });
 }
 /* 下一個要响的闹钟（按 next 时间戳取最小） */
 function alNextAlarm() {
@@ -3489,10 +3433,10 @@ function alRenderNextRing() {
   var nr = alNextAlarm();
   if (!nr) { card.style.display = "none"; return; }
   var sg = nr.song;
-  var name = (sg && sg.title) ? ("《" + sg.title + "》" + (sg.artist || "")) : "随机一首";
+  var name = (sg && sg.title) ? (sg.title + (sg.artist ? " - " + sg.artist : "")) : "Ngẫu nhiên 1 bài";
   card.style.display = "block";
   txt.textContent = alHm(nr) + " " + (nr.text || "") + " → " + name
-    + ((sg && sg.title && nr.cached) ? "（本地铃声）" : "");
+    + ((sg && sg.title && nr.cached) ? " (chuông nội bộ)" : "");
 }
 /* 「响铃歌曲」一栏：显示已经记住的默认铃声（device 侧全局默认） */
 function alRenderDflt(o) {
@@ -3500,8 +3444,8 @@ function alRenderDflt(o) {
   if (!e) return;
   if (ALSONG) return;          /* 刚手动挑过，以他挑的为准，别覆盖 */
   var t = (o && o.dfltSong) || "";
-  e.textContent = t ? ("《" + t + "》" + (o.dfltArtist || "") + "（已记住）")
-                    : "默认：随机播一首";
+  e.textContent = t ? (t + (o.dfltArtist ? " - " + o.dfltArtist : "") + " (đã lưu)")
+                    : "Mặc định: phát ngẫu nhiên 1 bài";
 }
 
 /* ================= 闹钟时间：列表式选择（pl-1.6.87） =================
@@ -3640,12 +3584,12 @@ function alHmToggle() {
 function alAdd() {
   alHmClamp();                       /* 手输了超范围的值先纠回来 */
   var h = ALHM.h, m = ALHM.m;
-  if (!(h >= 0 && h <= 23) || !(m >= 0 && m <= 59)) { toast("时间不对"); return; }
+  if (!(h >= 0 && h <= 23) || !(m >= 0 && m <= 59)) { toast("Giờ không hợp lệ"); return; }
   var rp = $("alRepeat").value;
   var q = "time=" + alPad(h) + ":" + alPad(m) + "&repeat=" + rp;
   if (rp === "weekly") {
     var ds = alDaysStr();
-    if (!ds) { toast("「每周」要先选哪几天"); return; }
+    if (!ds) { toast("Hãy chọn ít nhất một ngày trong tuần"); return; }
     q += "&days=" + ds;
   }
   if (ALSONG) {
@@ -3661,10 +3605,9 @@ function alTgId(el) {
 function alDelThis(el) {
   var id = el.getAttribute("data-id");
   var t = el.getAttribute("data-t") || "";
-  uiConfirm("删除闹钟「" + t + "」？\n\n删掉之后就不会再响了。\n"
-    + "只是暂时不想让它响，用左边的开关停用就行。",
+  uiConfirm("Xóa báo thức «" + t + "»?\n\nNếu chỉ muốn tắt tạm thời, hãy gạt công tắc bên trái.",
     function () { alAct("alarm_del", "id=" + encodeURIComponent(id)); },
-    { title: "删除闹钟", ok: "删除", danger: true });
+    { title: "Xóa báo thức", ok: "Xóa", danger: true });
 }
 function alPickThis(el) { alPickSong(el.getAttribute("data-id")); }
 function alTestThis(el) {
@@ -3684,11 +3627,11 @@ function alSearchSetRing(li) {
   var t = li.getAttribute("data-sr-title") || "";
   var a = li.getAttribute("data-sr-artist") || "";
   if (!t) return;
-  uiConfirm("把《" + t + "》" + (a || "") + " 设为闹钟铃声？\n（之后新建的闹钟都用它）",
+  uiConfirm("Đặt " + t + (a ? " - " + a : "") + " làm nhạc chuông báo thức mặc định?",
     function () {
       alAct("alarm_song", "id=next&title=" + encodeURIComponent(t)
         + "&artist=" + encodeURIComponent(a || ""));
-    }, { title: "设为铃声", ok: "就用它" });
+    }, { title: "Đặt làm nhạc chuông", ok: "Chọn bài này" });
 }
 var SR_LP_TIMER = null, SR_LP_DONE = 0, SR_LP_X = 0, SR_LP_Y = 0;
 function srLpCancel() { if (SR_LP_TIMER) { clearTimeout(SR_LP_TIMER); SR_LP_TIMER = null; } }
@@ -3730,7 +3673,7 @@ function loadAlarm() {
     .then(function (o) { renderAlarm(o); })
     .catch(function () {
       var h = $("alHint");
-      if (h) h.textContent = "取不到闹钟状态（小智未运行？）";
+      if (h) h.textContent = "Không lấy được báo thức (XiaoZhi chưa chạy?)";
     });
 }
 function renderAlarm(o) {
@@ -3743,13 +3686,13 @@ function renderAlarm(o) {
   var nOn = 0;
   for (var i = 0; i < AL.list.length; i++) { if (AL.list[i].enabled !== false) nOn++; }
   hint.textContent = AL.list.length
-    ? ("共 " + AL.list.length + " 个 · " + nOn + " 个开着" + (AL.ring ? " · 正在响" : ""))
-    : (o.ok === false ? (o.msg || "取不到") : "还没有闹钟");
+    ? ("Tổng " + AL.list.length + " · " + nOn + " đang bật" + (AL.ring ? " · Đang reo" : ""))
+    : (o.ok === false ? (o.msg || "Lỗi") : "Chưa có báo thức");
   if (rc) rc.style.display = AL.ring ? "block" : "none";
   if (AL.ring && $("alRingTitle")) {
     // v1.3.246：正在放的是「提示音」还是「歌」，页面上一眼能分清
-    $("alRingTitle").textContent = "闹钟正在响：" + (AL.ringTitle || "")
-      + (o.ringLocal ? "（本地铃声）" : "");
+    $("alRingTitle").textContent = "Báo thức đang reo: " + (AL.ringTitle || "")
+      + (o.ringLocal ? " (chuông nội bộ)" : "");
   }
   // v1.3.246：闹钟音量（用户设的保底值 + 系统两条流的实时值）
   AL.vol = o.vol || 50;
@@ -3765,16 +3708,16 @@ function renderAlarm(o) {
        device v1.3.253 才给这个字段，老 device 就回落成当前媒体流。 */
     var uv = (o.musicVolUser === undefined || o.musicVolUser < 0) ? null : o.musicVolUser;
     var mv = uv !== null ? uv : ((o.musicVol === undefined || o.musicVol < 0) ? "?" : o.musicVol);
-    $("alVolSys").textContent = (o.ringVolOn ? "正在响铃 · " : "")
-      + "音乐音量 " + mv + "% · 响铃设到 " + (o.vol || AL.vol || 50) + "%";
+    $("alVolSys").textContent = (o.ringVolOn ? "Đang reo · " : "")
+      + "Âm lượng nhạc " + mv + "% · Báo thức " + (o.vol || AL.vol || 50) + "%";
   }
   /* v1.3.248：铃声缓存目录 */
   if ($("alCacheTxt")) {
-    $("alCacheTxt").textContent = (o.cache === undefined ? "?" : o.cache) + " 首";
+    $("alCacheTxt").textContent = (o.cache === undefined ? "?" : o.cache) + " bài";
   }
   if ($("alCacheDir")) {
-    $("alCacheDir").textContent = (o.cacheDir || "目录不可用")
-      + (o.ringLocal ? " · 这次响的是本地铃声" : "");
+    $("alCacheDir").textContent = (o.cacheDir || "Thư mục không khả dụng")
+      + (o.ringLocal ? " · Đang dùng chuông nội bộ" : "");
   }
   /* v1.3.251：已缓存清单 + 下一個响铃歌曲 + 「响铃歌曲」一栏（默认铃声） */
   ALCACHE = (o.cacheList || []);
@@ -3782,15 +3725,14 @@ function renderAlarm(o) {
   alRenderNextRing();
   alRenderDflt(o);
   if (!AL.list.length) {
-    box.innerHTML = "<div class=\"note\" style=\"margin:0\">还没有闹钟。上面选个时间点「添加闹钟」，"
-      + "或者直接跟小智说「每天早上七点叫我」。</div>";
+    box.innerHTML = "<div class=\"note\" style=\"margin:0\">Chưa có báo thức. Chọn giờ ở trên rồi bấm «Thêm báo thức».</div>";
     return;
   }
   box.innerHTML = AL.list.map(function (it) {
     var on = it.enabled !== false;
     var ringing = AL.ring && AL.ring === it.id;
-    var line = ["响铃 " + alSongText(it)];
-    if (it.nextText && it.nextText !== "—") line.push("下次 " + it.nextText);
+    var line = ["Chuông: " + alSongText(it)];
+    if (it.nextText && it.nextText !== "—") line.push("Kế tiếp: " + it.nextText);
     return "<div class=\"alrow" + (on ? "" : " off") + (ringing ? " ring" : "") + "\">"
       + "<div class=\"mid\"><div class=\"hm\">" + alHm(it) + "</div>"
       + "<div class=\"rp\">" + alEsc(it.text || "") + "</div>"
@@ -3798,7 +3740,7 @@ function renderAlarm(o) {
       + "<div class=\"sw" + (on ? " on" : "") + "\" data-id=\"" + alEsc(it.id) + "\""
       + " onclick=\"alTgId(this)\"></div>"
       + "<button class=\"btn sm\" data-id=\"" + alEsc(it.id) + "\""
-      + " onclick=\"alPickThis(this)\">歌</button>"
+      + " onclick=\"alPickThis(this)\">Nhạc</button>"
       + "<button class=\"btn sm\" style=\"color:var(--err)\" data-id=\"" + alEsc(it.id) + "\""
       + " data-t=\"" + alEsc(it.text || "") + "\" onclick=\"alDelThis(this)\">✕</button>"
       + "</div>";
@@ -3810,18 +3752,18 @@ function alPickSong(id) {
   ALPICK = id || "";
   $("alModal").style.display = "block";
   $("alQ").value = "";
-  $("alQL").innerHTML = "<div class=\"note\" style=\"margin:0\">(加载…)</div>";
+  $("alQL").innerHTML = "<div class=\"note\" style=\"margin:0\">(Đang tải…)</div>";
   /* v1.3.248：先把「已缓存」标记拉回来，列表里已缓存的要排最前 */
   alLoadCache(function () { alPickSong2(); });
 }
 function alPickSong2() {
   if (ALFAV) { alRenderFav(); return; }
-  $("alQL").innerHTML = "<div class=\"note\" style=\"margin:0\">(加载收藏…)</div>";
+  $("alQL").innerHTML = "<div class=\"note\" style=\"margin:0\">(Đang tải yêu thích…)</div>";
   fetch("/api/fav")
     .then(function (r) { return r.json(); })
     .then(function (o) { ALFAV = (o && o.list) || []; alRenderFav(); })
     .catch(function () {
-      $("alQL").innerHTML = "<div class=\"note\" style=\"margin:0\">取不到收藏列表</div>";
+      $("alQL").innerHTML = "<div class=\"note\" style=\"margin:0\">Không tải được danh sách yêu thích</div>";
     });
 }
 function alPickClose() {
@@ -3849,8 +3791,8 @@ function alRenderFav() {
   /* v1.3.248：已缓存的排最前（用户要求「设铃声的时候优先显示已缓存的」） */
   ALROWS.sort(function (x, y) { return (y.c ? 1 : 0) - (x.c ? 1 : 0); });
   if (!ALROWS.length) {
-    box.innerHTML = "<div class=\"note\" style=\"margin:0\">没有匹配的收藏"
-      + (fav.length ? "（换个词试试）" : "（收藏还是空的，先用「默认随机」）") + "</div>";
+    box.innerHTML = "<div class=\"note\" style=\"margin:0\">Không có bài khớp"
+      + (fav.length ? " (thử từ khóa khác)" : " (danh sách yêu thích đang trống)") + "</div>";
     return;
   }
   box.innerHTML = ALROWS.map(function (r, i) {
@@ -3858,7 +3800,7 @@ function alRenderFav() {
       + "<div class=\"n\">" + (i + 1) + "</div>"
       + "<div class=\"tx\"><div class=\"a\">" + alEsc(r.t) + "</div>"
       + "<div class=\"b\">" + alEsc(r.a)
-      + (r.c ? " · <span style=\"color:#4caf50\">已缓存</span>" : "") + "</div></div></div>";
+      + (r.c ? " · <span style=\"color:#4caf50\">Đã lưu</span>" : "") + "</div></div></div>";
   }).join("");
 }
 function alPickSetAt(i) {
@@ -3871,7 +3813,7 @@ function alPickSetAt(i) {
        闹钟都默认用它（用户 2026-10-27：「之后 web 上或者语音设置铃声都应默认是设置的铃声」） */
     ALSONG = { k: r.k, title: r.t, artist: r.a };
     var e = $("alSongPick");
-    if (e) e.textContent = label + "（已记住）";
+    if (e) e.textContent = label + " (đã lưu)";
     alPickClose();
     alAct("alarm_dflt", "k=" + encodeURIComponent(r.k)
       + "&title=" + encodeURIComponent(r.t)
@@ -3890,7 +3832,7 @@ function alPickRandom() {
     /* v1.3.251：清掉已记住的默认铃声，回到随机 */
     ALSONG = null;
     var e = $("alSongPick");
-    if (e) e.textContent = "默认：随机播一首";
+    if (e) e.textContent = "Mặc định: phát ngẫu nhiên 1 bài";
     alPickClose();
     alAct("alarm_dflt", "clear=1");
     return;
@@ -3915,7 +3857,7 @@ function loadLog(n) {
       var box = $("logBox");
       box.textContent = t;
       box.scrollTop = box.scrollHeight;
-    }).catch(function () { $("logBox").textContent = "(拉取失败)"; });
+    }).catch(function () { $("logBox").textContent = "(Tải nhật ký thất bại)"; });
 }
 function copyLog() {
   var t = $("logBox").textContent;
@@ -3923,8 +3865,8 @@ function copyLog() {
     var ta = document.createElement("textarea");
     ta.value = t; document.body.appendChild(ta); ta.select();
     document.execCommand("copy"); document.body.removeChild(ta);
-    toast("已复制");
-  } catch (e) { toast("复制失败"); }
+    toast("Đã sao chép");
+  } catch (e) { toast("Sao chép thất bại"); }
 }
 
 /* ============================================================
@@ -3969,7 +3911,7 @@ function checkVer(o) {
     try { localStorage.setItem("r1_ver", o.ver); } catch (e) {}
     var b = $("updBar");
     if (!b) return;
-    b.textContent = "页面已过时（" + last + " → " + o.ver + "），点此刷新";
+    b.textContent = "Trang web đã có phiên bản mới (" + last + " → " + o.ver + "), chạm để tải lại";
     b.style.display = "block";
     b.onclick = function () {
       try {
@@ -4029,38 +3971,36 @@ function instRender() {
   if (!n || !b || !c) return;
   var sec = (window.isSecureContext === true);
   b.style.display = ""; c.style.display = "none"; b.disabled = false;
-  b.textContent = "安装应用";
+  b.textContent = "Cài ứng dụng";
   n.className = "note"; n.style.margin = "0"; n.style.color = "";
 
   if (instStandalone()) {
     n.className = "note"; n.style.color = "var(--ok)";
-    n.innerHTML = "已经在独立窗口里运行（standalone）—— 这就是装好之后的样子。";
+    n.innerHTML = "Đang chạy ở chế độ ứng dụng độc lập (standalone).";
     b.style.display = "none";
     return;
   }
   if (deferredPrompt) {
-    n.innerHTML = "可以安装了：点下面这个按钮，或用浏览器菜单里的「安装应用」。";
+    n.innerHTML = "Có thể cài đặt: bấm nút bên dưới hoặc chọn «Cài đặt ứng dụng» trong menu trình duyệt.";
     return;
   }
   if (!sec) {
     b.style.display = "none"; c.style.display = "";
     n.style.color = "var(--warn)";
-    n.innerHTML = "<b>装不了：当前不是安全上下文。</b><br>"
-      + "局域网 http 天生不算安全上下文（Service Worker 也注册不了），"
-      + "这是 Chrome 的硬门槛，跟我们的页面没关系。<br>"
-      + "安卓 Chrome 的绕法：地址栏进 <b>chrome://flags/#unsafely-treat-insecure-origin-as-secure</b>，"
-      + "填入 <b>" + esc(location.origin) + "</b> → Enabled → Relaunch，回来就能装。<br>"
-      + "iOS Safari 没这限制：分享 → 添加到主屏幕。";
+    n.innerHTML = "<b>Chưa cài PWA trực tiếp được vì đang dùng HTTP nội bộ.</b><br>"
+      + "Trên Chrome Android: mở <b>chrome://flags/#unsafely-treat-insecure-origin-as-secure</b>, "
+      + "nhập <b>" + esc(location.origin) + "</b> → Enabled → Relaunch.<br>"
+      + "Trên iOS Safari: bấm Chia sẻ → Thêm vào màn hình chính.";
     return;
   }
-  n.innerHTML = "没弹安装提示也没关系 —— 直接用浏览器菜单里的"
-    + "「安装应用」/「添加到主屏幕」。"
-    + (swState === "fail" ? "<br><b>Service Worker 注册失败</b>，Chrome 会拒绝安装。" : "");
+  n.innerHTML = "Hãy dùng menu trình duyệt chọn"
+    + " «Cài đặt ứng dụng» / «Thêm vào màn hình chính»."
+    + (swState === "fail" ? "<br><b>Service Worker chưa đăng ký được</b>." : "");
   b.disabled = true;
 }
 
 function doInstall() {
-  if (!deferredPrompt) { toast("用浏览器菜单里的「安装应用」/「添加到主屏幕」"); return; }
+  if (!deferredPrompt) { toast("Hãy chọn «Thêm vào màn hình chính» trong menu trình duyệt"); return; }
   deferredPrompt.prompt();
   deferredPrompt.userChoice.then(function () { deferredPrompt = null; instRender(); });
 }
@@ -4072,18 +4012,18 @@ function devRender() {
   var d = S.dev || {}, n = $("devNote");
   if (!n) return;
   n.textContent = d.on
-    ? "小智运行中（" + (d.pkg || "com.phicomm.speaker.device") + " · 8088 在线）"
-    : "小智已停用 —— 蓝牙 / DLNA / AirPlay 与本页面不受影响";
+    ? "XiaoZhi đang chạy (" + (d.pkg || "com.phicomm.speaker.device") + " · 8088 trực tuyến)"
+    : "XiaoZhi đã tắt — Bluetooth / DLNA / AirPlay và trang web vẫn hoạt động";
   var b1 = $("btnOff"), b2 = $("btnOn");
   if (b1) b1.disabled = !d.on;
   if (b2) b2.disabled = !!d.on;
 }
 function devOff() {
-  uiConfirm("停用小智？\n\n麦克风与云端连接会全部释放，音箱变成纯蓝牙/DLNA/AirPlay 音箱。\n"
-    + "本页不受影响，随时可以再启用。", function () {
+  uiConfirm("Tắt tiến trình XiaoZhi?\n\nMic và kết nối cloud sẽ được giải phóng, loa chạy thuần Bluetooth/DLNA/AirPlay.\n"
+    + "Trang web không bị ảnh hưởng và có thể bật lại bất cứ lúc nào.", function () {
     act("devctl", "v=off");
     setTimeout(function () { load(); loadQueue(); }, 3000);
-  }, { title: "停用小智", ok: "停用", danger: true });
+  }, { title: "Tắt XiaoZhi", ok: "Tắt", danger: true });
 }
 function devOn() {
   act("devctl", "v=on");
@@ -4116,26 +4056,26 @@ function devStat(o) {
   var freq = "";
   for (var i = 0; i < mhz.length; i++) { freq += (i ? "/" : "") + mhz[i]; }
   set("kCpu", o.cpuPct >= 0
-    ? o.cpuPct + "%" + (o.cores ? " · " + o.cores + "核" : "")
+    ? o.cpuPct + "%" + (o.cores ? " · " + o.cores + " nhân" : "")
       + (mhz.length ? " " + freq + "MHz" : "")
     : "—");
   set("kMem", o.memTotalKb
-    ? "已用 " + o.memUsedPct + "% · " + mb(o.memTotalKb - o.memAvailKb)
+    ? "Đã dùng " + o.memUsedPct + "% · " + mb(o.memTotalKb - o.memAvailKb)
       + " / " + mb(o.memTotalKb)
     : "—");
   set("kTemp", o.tempC >= 0 ? o.tempC + "°C" : "—");
   set("kDisk", o.diskTotalMb
-    ? "剩 " + o.diskAvailMb + "MB / " + o.diskTotalMb + "MB · 已用 " + o.diskUsedPct + "%"
+    ? "Trống " + o.diskAvailMb + "MB / " + o.diskTotalMb + "MB · Đã dùng " + o.diskUsedPct + "%"
     : "—");
   var top = (o.top && o.top.length) ? o.top[0] : null;
-  set("kProc", (o.procCount || 0) + " 个"
-    + (top ? " · 最大 " + top.name.replace("com.phicomm.speaker.", "") + " " + mb(top.rss) : ""));
+  set("kProc", (o.procCount || 0) + " tiến trình"
+    + (top ? " · Lớn nhất: " + top.name.replace("com.phicomm.speaker.", "") + " " + mb(top.rss) : ""));
 
   var n = $("cleanNote"), b = $("btnClean");
   var cl = o.cleanable || [];
   if (!n) return;
   if (!cl.length) {
-    n.textContent = "清理清单里没有可禁用的服务 —— 点按钮只清 /data 缓存";
+    n.textContent = "Không có dịch vụ thừa nào cần tắt — bấm nút sẽ chỉ dọn cache /data";
     if (b) b.disabled = false;
     return;
   }
@@ -4143,10 +4083,10 @@ function devStat(o) {
   for (var j = 0; j < cl.length; j++) {
     kb += cl[j].rss || 0;
     names.push(cl[j].name.replace("com.phicomm.speaker.", "").replace("com.android.", "a.")
-      + (cl[j].rss > 0 ? " " + mb(cl[j].rss) : "（未在跑）"));
+      + (cl[j].rss > 0 ? " " + mb(cl[j].rss) : " (không chạy)"));
   }
-  n.innerHTML = "可禁用 " + cl.length + " 个无用服务"
-    + (kb > 0 ? "（在跑的占 " + mb(kb) + "）" : "（都没在跑）")
+  n.innerHTML = "Có thể tắt " + cl.length + " dịch vụ thừa"
+    + (kb > 0 ? " (đang chiếm " + mb(kb) + ")" : " (không chạy)")
     + "：<b>" + esc(names.join("、")) + "</b>";
   if (b) b.disabled = false;
 }
@@ -4158,18 +4098,18 @@ function doClean() {
     var names = [];
     for (var i = 0; i < cl.length; i++) {
       names.push(cl[i].name
-        + (cl[i].rss > 0 ? "（在跑 " + Math.round(cl[i].rss / 1024) + "MB）" : "（未在跑）"));
+        + (cl[i].rss > 0 ? " (đang chạy " + Math.round(cl[i].rss / 1024) + "MB)" : " (không chạy)"));
     }
-    msg = "禁用 " + cl.length + " 个无用服务（pm hide）？\n\n" + names.join("\n")
-        + "\n\n只在音箱上用不到的那几个，播放、蓝牙、小智、本页都不受影响；\n"
-        + "想恢复点旁边的「恢复已禁用服务」。";
+    msg = "Tắt " + cl.length + " dịch vụ thừa (pm hide)?\n\n" + names.join("\n")
+        + "\n\nBluetooth, phát nhạc, XiaoZhi và trang web không bị ảnh hưởng.\n"
+        + "Có thể khôi phục bằng nút «Khôi phục dịch vụ».";
   } else {
-    msg = "当前没有可禁用的无用服务（清单里的都没装，或已经禁过了）。\n\n"
-        + "只清一遍 /data 缓存？\n（清的是各 app 的缓存文件，不动曲库和设置）";
+    msg = "Không còn dịch vụ thừa nào cần tắt.\n\n"
+        + "Chỉ dọn bộ nhớ đệm /data? (Không xóa cài đặt)";
   }
   uiConfirm(msg, function () {
     act("cleanup").then(function () { setTimeout(loadDev, 2500); });
-  }, { title: "清理", ok: "开始清理", danger: true });
+  }, { title: "Dọn dẹp", ok: "Bắt đầu dọn", danger: true });
 }
 function doRestore() {
   act("restore").then(function () { setTimeout(loadDev, 2500); });
@@ -4201,27 +4141,27 @@ function btShow(o) {
     if (!discPend() && DISC_WANT != null) { DISC_WANT = null; setTimeout(loadBt, 1200); }
   }
   if (!o.has) {
-    h.textContent = "不支持";
-    if (n) n.textContent = "取不到 BluetoothAdapter —— 这台机器可能没有蓝牙硬件。";
+    h.textContent = "Không hỗ trợ";
+    if (n) n.textContent = "Không tìm thấy BluetoothAdapter trên thiết bị.";
     return;
   }
   // 切换中才显示「正在…」；真值已经跟期盼一致就按正常态渲染（行与按钮同步）
   var pOn = btPend() && (BT_WANT == null || !!o.on !== BT_WANT);
   var pDisc = discPend() && (DISC_WANT == null || !!o.disc !== DISC_WANT);
   h.textContent = pOn
-    ? (BT_WANT ? "正在开启…" : "正在关闭…")
-    : ((o.on ? "已开启" : "已关闭")
-      + (o.name ? " · " + o.name : "") + (o.discovering ? " · 扫描中…" : "")
+    ? (BT_WANT ? "Đang bật…" : "Đang tắt…")
+    : ((o.on ? "Đang bật" : "Đã tắt")
+      + (o.name ? " · " + o.name : "") + (o.discovering ? " · Đang quét…" : "")
       + (o.on && o.scanMode != null ? " · scan " + o.scanMode : ""));
   // 开/关合成一个按钮（点一下翻转）；切换中置灰防连点（真值一到位 btSync 就提前解锁）
   var t1 = $("btnBtOn");
   if (t1) {
     if (pOn) {
-      t1.textContent = BT_WANT ? "正在开启…" : "正在关闭…";
+      t1.textContent = BT_WANT ? "Đang bật…" : "Đang tắt…";
       t1.className = "btn";
       t1.disabled = true;
     } else {
-      t1.textContent = o.on ? "关闭蓝牙" : "打开蓝牙";
+      t1.textContent = o.on ? "Tắt Bluetooth" : "Bật Bluetooth";
       t1.className = "btn " + (o.on ? "dgr" : "pri");
       t1.disabled = false;
     }
@@ -4229,58 +4169,55 @@ function btShow(o) {
   var t2 = $("btnBtDisc");
   if (t2) {
     if (pDisc) {
-      t2.textContent = DISC_WANT ? "正在开放…" : "正在收回…";
+      t2.textContent = DISC_WANT ? "Đang mở…" : "Đang đóng…";
       t2.className = "btn";
       t2.disabled = true;
     } else {
       t2.textContent = o.disc
-        ? ("可被搜到：开" + (o.discLeft ? "（" + o.discLeft + "s）" : ""))
-        : "可被搜到：关";
+        ? ("Hiển thị tìm kiếm: Bật" + (o.discLeft ? " (" + o.discLeft + "s)" : ""))
+        : "Hiển thị tìm kiếm: Tắt";
       t2.className = "btn " + (o.disc ? "" : "dgr");
       t2.disabled = false;
     }
   }
   if (n) {
-    n.innerHTML = "本机：" + esc(o.addr || "—")
-      + (o.sink ? "" : "（A2DP 服务未就绪，蓝牙刚开的话等几秒）")
-      + "<br>共 " + ((o.bonded || []).length) + " 台已配对"
-      + (o.foundCount ? " · 上次扫描发现 " + o.foundCount + " 台" : "")
-      + "<br>「可被搜到」= <b>60 秒临时窗口</b>：开启后有设备连上会立刻收回，"
-      + "没人连 1 分钟后自动收回（防误连）。收回后 scan 21 = "
-      + "已配对手机随时能连、陌生人搜不到，日常不用再开。<br>"
-      + "万一手机连不上，看这行 scan："
-      + "20 = 谁也不收（重开「可被搜到」窗口即可），21 = 已配对可连，23 = 窗口开放中。";
+    n.innerHTML = "MAC loa: " + esc(o.addr || "—")
+      + (o.sink ? "" : " (A2DP chưa sẵn sàng, chờ vài giây nếu vừa bật Bluetooth)")
+      + "<br>Đã ghép đôi: " + ((o.bonded || []).length) + " thiết bị"
+      + (o.foundCount ? " · Lần quét gần nhất thấy " + o.foundCount + " thiết bị" : "")
+      + "<br>«Hiển thị tìm kiếm» chỉ mở <b>60 giây</b>: tự đóng ngay khi có máy kết nối hoặc hết 1 phút. "
+      + "Scan mode: 20 = đóng hoàn toàn, 21 = máy đã ghép nối lại được, 23 = đang mở tìm kiếm.";
   }
   if (!l) return;
   var html = "";
   var bd = o.bonded || [];
   if (bd.length) {
-    html += "<div class='note' style='margin:2px 0'>已配对</div>";
+    html += "<div class='note' style='margin:2px 0'>Đã ghép đôi</div>";
     for (var i = 0; i < bd.length; i++) html += btRow(bd[i], true);
   }
   var fd = o.found || [];
   if (fd.length) {
-    html += "<div class='note' style='margin:6px 0 2px'>扫描到的（未配对）</div>";
+    html += "<div class='note' style='margin:6px 0 2px'>Tìm thấy (chưa ghép đôi)</div>";
     for (var j = 0; j < fd.length; j++) html += btRow(fd[j], false);
   }
-  l.innerHTML = html || "<div class='note'>还没有设备 —— 点「扫描设备」找找</div>";
+  l.innerHTML = html || "<div class='note'>Chưa có thiết bị nào — bấm «Quét thiết bị»</div>";
 }
 
 function btRow(d, bonded) {
-  var st = d.connected ? "<b style='color:#4ade80'>已连接</b>"
-    : (bonded ? "已配对" : "未配对");
+  var st = d.connected ? "<b style='color:#4ade80'>Đã kết nối</b>"
+    : (bonded ? "Đã ghép đôi" : "Chưa ghép đôi");
   var b = "";
   if (bonded) {
     // 已配对：连接/断开 + 取消配对（小按钮，别把列表栏拉宽）
     b += d.connected
-      ? "<button class='btn dgr sm' onclick=\"btAct('bt_disconnect','" + d.addr + "')\">断开</button>"
-      : "<button class='btn sm' onclick=\"btAct('bt_connect','" + d.addr + "')\">连接</button>";
-    b += "<button class='btn dgr sm' onclick=\"btUnpair('" + d.addr + "')\">取消配对</button>";
+      ? "<button class='btn dgr sm' onclick=\"btAct('bt_disconnect','" + d.addr + "')\">Ngắt kết nối</button>"
+      : "<button class='btn sm' onclick=\"btAct('bt_connect','" + d.addr + "')\">Kết nối</button>";
+    b += "<button class='btn dgr sm' onclick=\"btUnpair('" + d.addr + "')\">Hủy ghép đôi</button>";
   } else {
     // 扫描到的：只留一个配对类按钮（已配过的显示取消配对）
     b += d.bond === 12
-      ? "<button class='btn dgr sm' onclick=\"btUnpair('" + d.addr + "')\">取消配对</button>"
-      : "<button class='btn sm' onclick=\"btAct('bt_pair','" + d.addr + "')\">配对</button>";
+      ? "<button class='btn dgr sm' onclick=\"btUnpair('" + d.addr + "')\">Hủy ghép đôi</button>"
+      : "<button class='btn sm' onclick=\"btAct('bt_pair','" + d.addr + "')\">Ghép đôi</button>";
   }
   return "<div class='kv'><span>" + esc(d.name)
     + "<br><span style='opacity:.55'>" + esc(d.addr) + "</span></span><b>" + st + "</b></div>"
@@ -4308,9 +4245,9 @@ function svcPend() { return Date.now() < SVC_LOCK; }
 function btSync() { loadBt(); }
 
 function btToggle() {
-  if (btPend()) { toast("蓝牙正在切换，稍等一下"); return; }
+  if (btPend()) { toast("Bluetooth đang chuyển trạng thái, vui lòng chờ"); return; }
   var btn = $("btnBtOn");
-  if (btn) { btn.disabled = true; btn.textContent = "读取中…"; }
+  if (btn) { btn.disabled = true; btn.textContent = "Đang đọc…"; }
   fetch("/api/bt").then(function (r) { return r.json(); }).then(function (o) {
     if (!o) { if (btn) btn.disabled = false; return; }
     S.bt = o;
@@ -4322,15 +4259,15 @@ function btToggle() {
       setTimeout(btSync, 1200); setTimeout(btSync, 3000);
       setTimeout(btSync, 6000); setTimeout(btSync, 9000);
     });
-  })["catch"](function () { toast("蓝牙状态取不到"); if (btn) btn.disabled = false; });
+  })["catch"](function () { toast("Không đọc được trạng thái Bluetooth"); if (btn) btn.disabled = false; });
 }
 function btAct(op, addr) {
   act(op, "addr=" + encodeURIComponent(addr)).then(function () { setTimeout(loadBt, 3000); });
 }
 function btUnpair(addr) {
-  uiConfirm("取消配对 " + addr + "？",
+  uiConfirm("Hủy ghép đôi " + addr + "?",
     function () { btAct("bt_unpair", addr); },
-    { title: "取消配对", ok: "取消配对", danger: true });
+    { title: "Hủy ghép đôi", ok: "Hủy ghép đôi", danger: true });
 }
 function btScan() {
   act("bt_scan").then(function () {
@@ -4340,9 +4277,9 @@ function btScan() {
   });
 }
 function btDisc() {
-  if (discPend()) { toast("正在切换，稍等一下"); return; }
+  if (discPend()) { toast("Đang chuyển trạng thái, vui lòng chờ"); return; }
   var btn = $("btnBtDisc");
-  if (btn) { btn.disabled = true; btn.textContent = "读取中…"; }
+  if (btn) { btn.disabled = true; btn.textContent = "Đang đọc…"; }
   fetch("/api/bt").then(function (r) { return r.json(); }).then(function (o) {
     if (!o) { if (btn) btn.disabled = false; return; }
     S.bt = o;
@@ -4353,15 +4290,15 @@ function btDisc() {
     return act("bt_discover", "v=" + (want ? 1 : 0), true).then(function () {
       setTimeout(btSync, 1200); setTimeout(btSync, 3000);
     });
-  })["catch"](function () { toast("蓝牙状态取不到"); if (btn) btn.disabled = false; });
+  })["catch"](function () { toast("Không đọc được trạng thái Bluetooth"); if (btn) btn.disabled = false; });
 }
 
 /* ---------------- 外部播放源 DLNA / AirPlay ---------------- */
 /* ---------------- 外部播放源 DLNA / AirPlay ---------------- */
 function svcToggle(w) {
-  if (svcPend()) { toast("正在切换，稍等一下"); return; }
+  if (svcPend()) { toast("Đang chuyển trạng thái, vui lòng chờ"); return; }
   var btn = w === "dlna" ? $("btnDlna") : $("btnAir");
-  if (btn) { btn.disabled = true; btn.textContent = "读取中…"; }
+  if (btn) { btn.disabled = true; btn.textContent = "Đang đọc…"; }
   fetch("/api/svc").then(function (r) { return r.json(); }).then(function (o) {
     if (!o) { if (btn) btn.disabled = false; return; }
     S.svc = o;
@@ -4372,7 +4309,7 @@ function svcToggle(w) {
     return act(w, "v=" + (want ? 1 : 0), true).then(function () {
       setTimeout(svcSync, 1200); setTimeout(svcSync, 3000); setTimeout(svcSync, 6000);
     });
-  })["catch"](function () { toast("投播状态取不到"); if (btn) btn.disabled = false; });
+  })["catch"](function () { toast("Không đọc được trạng thái DLNA/AirPlay"); if (btn) btn.disabled = false; });
 }
 /* 拉一次真值；命中期盼就提前解锁（解锁逻辑在 svcShow 里） */
 function svcSync() { loadSvc(); }
@@ -4392,41 +4329,41 @@ function svcShow(o) {
   if (!svcPend() && SVC_WANT) { SVC_WANT = null; setTimeout(loadSvc, 1200); }
   {
       var a = $("kDlna"), b = $("kAir"), n = $("svcNote");
-      if (a) a.innerHTML = (o.dlna ? "<b style='color:#4ade80'>已开启</b>" : "未开启")
-        + (o.dlnaProc ? " · 进程在" : " · <b style='color:#f87171'>进程不在</b>")
-        + (o.dlnaPlaying ? " · <b style='color:#4ade80'>推流中</b>" : "");
-      if (b) b.innerHTML = (o.airplay ? "<b style='color:#4ade80'>已开启</b>" : "未开启")
-        + (o.airProc ? " · 进程在" : " · <b style='color:#f87171'>进程不在</b>")
-        + (o.airPlaying ? " · <b style='color:#4ade80'>推流中</b>" : "");
+      if (a) a.innerHTML = (o.dlna ? "<b style='color:#4ade80'>Đang bật</b>" : "Đã tắt")
+        + (o.dlnaProc ? " · Tiến trình chạy" : " · <b style='color:#f87171'>Tiến trình dừng</b>")
+        + (o.dlnaPlaying ? " · <b style='color:#4ade80'>Đang phát</b>" : "");
+      if (b) b.innerHTML = (o.airplay ? "<b style='color:#4ade80'>Đang bật</b>" : "Đã tắt")
+        + (o.airProc ? " · Tiến trình chạy" : " · <b style='color:#f87171'>Tiến trình dừng</b>")
+        + (o.airPlaying ? " · <b style='color:#4ade80'>Đang phát</b>" : "");
       // 开/关合成一个按钮，文案跟着实际状态走；只有「真值还没到位」时才显示 正在…
       // （真值到了就正常渲染 —— 行与按钮永远同一个状态，不会再各说各话）
       var pd = svcPend() && SVC_WANT && SVC_WANT.k === "dlna" && (!!o.dlna !== SVC_WANT.v);
       var d = $("btnDlna");
       if (d) {
-        d.textContent = pd ? (SVC_WANT.v ? "正在开启…" : "正在关闭…") : (o.dlna ? "关 DLNA" : "开 DLNA");
+        d.textContent = pd ? (SVC_WANT.v ? "Đang bật…" : "Đang tắt…") : (o.dlna ? "Tắt DLNA" : "Bật DLNA");
         d.className = "btn " + (pd ? "" : (o.dlna ? "dgr" : "pri"));
         d.disabled = !!pd;
       }
       var pe = svcPend() && SVC_WANT && SVC_WANT.k === "airplay" && (!!o.airplay !== SVC_WANT.v);
       var e = $("btnAir");
       if (e) {
-        e.textContent = pe ? (SVC_WANT.v ? "正在开启…" : "正在关闭…") : (o.airplay ? "关 AirPlay" : "开 AirPlay");
+        e.textContent = pe ? (SVC_WANT.v ? "Đang bật…" : "Đang tắt…") : (o.airplay ? "Tắt AirPlay" : "Bật AirPlay");
         e.className = "btn " + (pe ? "" : (o.airplay ? "dgr" : "pri"));
         e.disabled = !!pe;
       }
-      if (n) n.textContent = "功能状态 = 读内核 socket 表的实际占用（DLNA 看 UDP 1900、"
-        + "AirPlay 看 TCP 5002），「推流中」= 问真实播放引擎（AIDL isPlaying）；"
-        + "进程是功能的载体，我们不杀它。<br>"
-        + "★ 手动开过的（蓝牙/DLNA/AirPlay 都算，各自记账），万一被系统停了会自动补开；"
-        + "手动关过的一律不自动补开。AirPlay 的账要你先在页面上开过一次才算数"
-        + "（没有苹果设备也能验：开/关后看这行「已开启/未开启」和端口在不在）。";
+      if (n) n.textContent = "Trạng thái kiểm tra trực tiếp cổng mạng (DLNA: UDP 1900, "
+        + "AirPlay: TCP 5002). "
+        + ""
+        + "Dịch vụ đã bật thủ công sẽ tự khôi phục nếu hệ thống tạm dừng; "
+        + "dịch vụ đã tắt sẽ không tự bật lại."
+        + "";
   }
 }
 
 function copyFlag() {
   var t = location.origin;
-  try { navigator.clipboard.writeText(t); toast("已复制：" + t); }
-  catch (e) { toast("复制失败，请手抄：" + t); }
+  try { navigator.clipboard.writeText(t); toast("Đã sao chép: " + t); }
+  catch (e) { toast("Sao chép thất bại: " + t); }
 }
 
 function load() {
@@ -4456,7 +4393,7 @@ function load() {
       var ex = m.ext || null;
       var extOn = !!(ex && ex.playing);
       MI = extOn
-        ? { title: ex.title || "外部推流", artist: ex.artist || "",
+        ? { title: ex.title || "Phát từ nguồn ngoài", artist: ex.artist || "",
             position: 0, duration: 0 }
         : { title: m.curTitle || "", artist: m.curArtist || "",
             position: m.posMs || 0, duration: m.durMs || 0 };
@@ -4500,14 +4437,14 @@ function load() {
       /* pl-1.6.29：码率 / 格式（含电台） */
       readQual(m); paintQual();
       if (extOn) {
-        $("npNote").textContent = "手机 " + (PTYPE === 2 ? "DLNA" : "AirPlay")
-          + " 推流中 —— 声音走推流通道；网页播放/切歌只对本地队列生效，不影响推流";
+        $("npNote").textContent = "Đang phát qua " + (PTYPE === 2 ? "DLNA" : "AirPlay")
+          + " — điều khiển trên web chỉ áp dụng cho danh sách nội bộ";
       } else if (STALL) {
         /* pl-1.6.9：卡住时给个能动手的出路 —— 它自己不会跳下一首 */
-        $("npNote").textContent = "这首没出声（多半是在线取链失败，也可能是缓冲慢）—— "
-          + "在线歌首次起播本来就要等十几秒；不想等就点 ⏭ 换一首";
-      } else if ($("npNote").textContent.indexOf("推流") >= 0
-                 || $("npNote").textContent.indexOf("没出声") >= 0) {
+        $("npNote").textContent = "Bài này chưa ra tiếng (tải chậm hoặc lỗi nguồn) — "
+          + "bấm ⏭ để chuyển bài";
+      } else if ($("npNote").textContent.indexOf("DLNA") >= 0 || $("npNote").textContent.indexOf("AirPlay") >= 0
+                 || $("npNote").textContent.indexOf("chưa ra tiếng") >= 0) {
         $("npNote").textContent = "";
       }
       // ★ pl-1.6.9：队列跟着这轮 3s 的状态走 —— 以前队列固定 10s 才拉一次全量，
@@ -4531,27 +4468,27 @@ function load() {
       devRender();
     }
 
-    $("dev").textContent = "R1 小智";
+    $("dev").textContent = "R1 XiaoZhi";
     $("kIp").textContent = S.ip || "—";
     $("kSt").textContent = stCn((S.session && S.session.state) || "—");
     $("kRaw").textContent = (S.session && S.session.raw != null)
-      ? (S.session.raw + " / 峰值 " + S.session.rawPeak) : "—";
+      ? (S.session.raw + " / đỉnh " + S.session.rawPeak) : "—";
     $("kCode").textContent = actv.code || "—";
     $("kDid").textContent = actv.deviceId || "—";
     $("kCid").textContent = actv.clientId || "—";
-    $("footVer").textContent = "v" + S.ver + " · 已运行 " + upCn(S.uptimeSec) + " · 端口 " + S.port;
+    $("footVer").textContent = "v" + S.ver + " · Hoạt động " + upCn(S.uptimeSec) + " · Cổng " + S.port;
 
     var sv = S.server || {};
     $("curOta").textContent = sv.ota || "—";
     // v1.3.259：显示真实生效的 WS 地址（OTA 下发的也算，不再只看手动覆盖）
-    $("curWs").textContent = sv.wsEffective || sv.wsOverride || "(OTA 未返回)";
+    $("curWs").textContent = sv.wsEffective || sv.wsOverride || "(OTA chưa trả về)";
     if (!$("inOta").value) $("inOta").value = sv.ota || "";
     if (!$("inWs").value) $("inWs").value = sv.wsOverride || "";
     if (!$("inToken").value) $("inToken").value = sv.serverToken || "";
     // v1.3.259：显示真实生效的 token（手动优先，否则 = OTA 返回的，官方是 test-token）
     $("curToken").textContent = (sv.tokenEffective && sv.tokenEffective.length)
         ? sv.tokenEffective
-        : (sv.serverToken && sv.serverToken.length ? "已设置 " + sv.serverToken.substring(0, 4) + "…" : "—");
+        : (sv.serverToken && sv.serverToken.length ? "Đã đặt " + sv.serverToken.substring(0, 4) + "…" : "—");
 
     // 顶栏
     // ★ player 直供模式（wsAbsent，本页由 player 自己吐）下没有 WS 这回事 ——
@@ -4564,17 +4501,17 @@ function load() {
     var sub = [];
     // ver 可能本身带前缀（player 版是 "pl-1.6.8"）⇒ 别再拼出 "vpl-1.6.8"
     sub.push(/^p[lv]-/.test(S.ver || "") ? S.ver : "v" + S.ver);
-    sub.push("运行 " + upCn(S.uptimeSec));
+    sub.push("Chạy " + upCn(S.uptimeSec));
     sub.push(stCn(st));
-    if (!wsAbsent) sub.push(wsOpen ? "WS 已连" : "WS 未连");
+    if (!wsAbsent) sub.push(wsOpen ? "WS đã nối" : "WS ngắt");
     $("sub").innerHTML = sub.map(function (x) { return "<span>" + esc(x) + "</span>"; }).join("");
     // 兜底：万一 WS 在状态回来之前就试错过（pill 被染成「8080 无」），这里按真实
     // S.pl 纠正回来 —— 数据是对的，只是标签定错了。
     if (S.pl && !wsOpen) {
       wsAbsent = true;
-      $("wsPill").textContent = "player 直供";
+      $("wsPill").textContent = "Player trực tiếp";
       $("wsPill").style.color = "var(--ok)";
-      if ($("npNote").textContent.indexOf("自有链路") === 0) $("npNote").textContent = "";
+      if ($("npNote").textContent.indexOf("Kênh nội bộ") === 0) $("npNote").textContent = "";
     }
 
     // 开关
@@ -4605,10 +4542,22 @@ function load() {
     // 增益
     var gd = $("segGain").children;
     for (var i = 0; i < gd.length; i++) {
-      gd[i].className = (+gd[i].getAttribute("data-v") === a.gain) ? "on" : "";
+      gd[i].className = (+gd[i].getAttribute("data-v") === (a.gain || 4)) ? "on" : "";
     }
     applyGainLock(!!a.alc);
     fillChain(a);
+    // P2: TTS volume slider sync
+    if (a.ttsVol != null && !TTS_UI) {
+      var rgT = $("rgTtsVol");
+      if (rgT) rgT.value = a.ttsVol;
+      var lbT = $("lbTtsVol");
+      if (lbT) lbT.textContent = a.ttsVol + "%";
+    }
+    // P1: Idle auto-disconnect seconds sync
+    if (a.idleSec != null && document.activeElement !== $("inIdleSec")) {
+      var inI = $("inIdleSec");
+      if (inI) inI.value = a.idleSec;
+    }
 
     // 音量：WS 在线时由 get_info 覆盖；离线才用自有值（自有是 0~100 百分比，要换算成档位）
     // ★ pl-1.1.1：player 会把真实满档 volMax 报上来，滑块量程跟着它走
@@ -4616,7 +4565,7 @@ function load() {
     if (!wsOK && m.volume != null && m.volume >= 0) {
       var mv0 = +($("vol").max || 15);
       applyVol(Math.round(m.volume * mv0 / 100), 0,
-        S.pl ? "系统音乐流（player 直读）" : "系统音乐流");
+        S.pl ? "Âm lượng nhạc (player)" : "Âm lượng nhạc");
     }
 
     // 电台（v1.3.156：从横向 chips 改成可滚动列表 —— 可视 5 行，多于 5 台在框内滑；
@@ -4633,7 +4582,7 @@ function load() {
     $("srcList").innerHTML = ss.map(function (x) {
       return '<div class="kv"><span style="word-break:break-all;max-width:70%">' + esc(x.url)
         + (x.err ? '<br><span style="color:var(--err)">' + esc(x.err) + "</span>" : "")
-        + "</span><b>" + esc(x.tracks) + " 曲 / " + esc(x.radios) + " 台</b></div>";
+        + "</span><b>" + esc(x.tracks) + " bài / " + esc(x.radios) + " đài</b></div>";
     }).join("");
 
     // 降级：WS 拿不到时的曲名（v1.3.163：这是**主路径**了 —— 原厂 player 没有 8080，
@@ -4647,12 +4596,12 @@ function load() {
          （那种版本拿不到真实总时长，区分不了「缓冲中」，一上来仍按在播算） */
       PH = m.phase || (m.playing ? (m.stalled ? "stalled" : "playing") : "idle");
       STALL = (PH === "stalled");
-      $("npT").textContent = m.curTitle || "未播放";
+      $("npT").textContent = m.curTitle || "Chưa phát";
       $("npA").textContent = (m.curArtist || " ")
-        + (PH === "playing" ? "　·　播放中"
-           : (PH === "loading" ? "　·　缓冲中"
-              : (PH === "stalled" ? "　·　缓冲中（可能没出声）"
-                 : (m.curTitle ? "　·　空闲" : ""))));
+        + (PH === "playing" ? " · Đang phát"
+           : (PH === "loading" ? " · Đang tải"
+              : (PH === "stalled" ? " · Đang tải (chưa có tiếng)"
+                 : (m.curTitle ? " · Đang dừng" : ""))));
       // pl-1.6.5：实际歌曲信息（专辑 · 时长）—— ★ pl-1.6.15 与上面同理：
       //   专辑=歌名不显示；来源只留 npTag 一颗 pill，不再写第二遍
       var _pm = [];
@@ -4663,14 +4612,14 @@ function load() {
       readQual(m); paintQual();
       QPIC = String(m.curPic || "");   // pl-1.6.16：老 device 版兜底块也要带封面
       $("npNote").textContent = m.stale
-        ? "上次播过的曲名（player 重启后列表已空）—— 点 ▶ 会重新播放它"
+        ? "Bài phát gần nhất (hàng đợi đã trống sau khi khởi động lại) — bấm ▶ để phát lại"
         : (m.curTitle ? wsWaitTxt()
-           : "还没播过 —— 去音乐页搜一首点它，或点上面的「随便听」");
+           : "Chưa phát bài nào — sang mục Âm nhạc hoặc bấm «Nghe ngẫu nhiên»");
       $("cover").className = "cover"
         + (PH === "playing" ? " spin" : (PH === "loading" ? " wait" : ""));
-      $("qHint").textContent = "点一下即播（自有队列）";
+      $("qHint").textContent = "Chạm để phát (hàng đợi nội bộ)";
       /* pl-1.6.45：换曲观察期内同样不贴标签（老 device 兜底路径） */
-      setTag((!m.viaPend && m.qRadio) ? "广播电台" : "");
+      setTag((!m.viaPend && m.qRadio) ? "Đài phát thanh" : "");
       /* pl-1.6.9（二）：device 版拿不到真实进度，只能按 playTs 累加 —— 那正是
          「没播出来但时间一直在走」的观感来源 ⇒ 起播缓冲 / 卡住时都不走这个假计时。
          ★ pl-1.6.9（三）：player 直供（S.pl）有真实 posMs/durMs，renderNp() 已经画好了，
@@ -4681,14 +4630,14 @@ function load() {
       var el = m.playTs ? (Date.now() - m.playTs) : 0;
       if (limS > 0 && el > limS * 1000) el = limS * 1000;
       $("npDur").textContent = MDUR || "—";       // 总时长（列表元数据）一直可见
-      if (PH === "loading") $("npPos").textContent = "缓冲中";
-      else if (PH === "stalled") $("npPos").textContent = "没出声";
+      if (PH === "loading") $("npPos").textContent = "Đang tải";
+      else if (PH === "stalled") $("npPos").textContent = "Không có tiếng";
       else $("npPos").textContent = m.playing ? fmt(el) : "—";
       $("npBar").style.width = "0%";
     }
     /* ★ pl-1.6.159：status 里地址/标题都到齐了，这时才问服务端来源（每首一次） */
     if (!extOn) { fetchSrcLabel(CURURL, (MI && MI.title) || ""); }
-  }).catch(function () { toast("状态拉取失败"); });
+  }).catch(function () { toast("Không lấy được trạng thái"); });
 }
 
 /* ============================================================
@@ -4705,9 +4654,9 @@ function wsInit() {
   //   别去连，直接走自有链路 —— 队列/进度/时长全由 player 直供，比 WS 还准。
   if (S && S.pl) {
     wsAbsent = true; wsOK = false;
-    $("wsPill").textContent = "player 直供";
+    $("wsPill").textContent = "Player trực tiếp";
     $("wsPill").style.color = "var(--ok)";
-    $("qHint").textContent = "点一下即播（player 真实队列）";
+    $("qHint").textContent = "Chạm để phát ngay";
     $("npNote").textContent = "";
     return;
   }
@@ -4718,7 +4667,7 @@ function wsInit() {
     $("wsPill").textContent = "WS 8080";
     $("wsPill").style.color = "var(--ok)";
     $("npNote").textContent = "";
-    $("qHint").textContent = "点一下即播（来自 8080）";
+    $("qHint").textContent = "Chạm để phát (8080)";
     wsAsk("get_info"); wsAsk("list");
   };
   // v1.3.163：认定 8080 不存在后把重试降到 20s（还要留着 —— 万一刷回魔改版能自动接上），
@@ -4740,20 +4689,20 @@ function wsWaitSec() { return wsDownTs ? Math.round((Date.now() - wsDownTs) / 10
 function wsWaitTxt() {
   if (wsAbsent) {
     return (S && S.pl)
-      ? "自有链路：队列与曲名由 player 本地直读，不依赖 WS（8080 是 HTTP 控制台）"
+      ? "Kênh nội bộ: đọc trạng thái trực tiếp từ player"
       : "";                       // 二改：不再输出链路说明
   }
   var s = wsWaitSec();
-  return "音箱播放服务（8080）断了" + (s > 0 ? " " + s + "s" : "") + "，正在重连…（控制不受影响）";
+  return "Dịch vụ phát (8080) mất kết nối" + (s > 0 ? " " + s + "s" : "") + ", đang nối lại…";
 }
 function wsDown() {
   if (!wsDownTs) wsDownTs = Date.now();
   wsOK = false;
   wsFail++;
   if (wsFail >= 3) wsAbsent = true;
-  $("wsPill").textContent = wsAbsent ? "8080 无" : "WS 离线";
+  $("wsPill").textContent = wsAbsent ? "Không có WS" : "WS ngoại tuyến";
   $("wsPill").style.color = wsAbsent ? "var(--tx3)" : "var(--warn)";
-  $("qHint").textContent = wsAbsent ? "点一下即播（自有队列）" : "WS 未连接（点播走自有队列）";
+  $("qHint").textContent = wsAbsent ? "Chạm để phát" : "WS chưa nối (dùng hàng đợi nội bộ)";
   $("npNote").textContent = wsWaitTxt();
 }
 function wsSend(o) {
@@ -4795,7 +4744,7 @@ function onWs(raw) {
     if (CURURL) { fetchSrcLabel(CURURL, (MI && MI.title) || ""); }
     renderNp();
     if (d.vol != null) {
-      applyVol(d.vol, d.max_vol || 0, "音箱实时");
+      applyVol(d.vol, d.max_vol || 0, "Âm lượng loa");
     }
   } else if (t === "list") {
     PLIST = d.playList || [];
@@ -4825,7 +4774,7 @@ function saveQlim() {
   if (isNaN(n) || n < 0) n = 0;
   QLIM = n;
   try { localStorage.setItem("r1_qlim", String(n)); } catch (e) {}
-  toast(n === 0 ? "本地曲目上限：不限制（列全部）" : ("本地曲目上限：" + n + " 首"));
+  toast(n === 0 ? "Giới hạn nội bộ: không giới hạn" : ("Giới hạn nội bộ: " + n + " bài"));
   loadQueue();
   // v1.3.180：本地上限也写进 device（files/playlist_max）—— 语音路径「播放周杰伦的歌」
   // 推多少首同样受它限制，光改浏览器 localStorage 管不到那边。
@@ -4849,8 +4798,41 @@ function saveOlim() {
   OLIM = n;
   try { localStorage.setItem("r1_olim", String(n)); } catch (e) {}
   post("/api/set", "onlineMax=" + n).then(function (r) {
-    toast((r && r.msg) ? r.msg : ("在线曲目上限：" + n + " 首"));
-  }).catch(function () { toast("在线上限已记在本机，但没写进小智进程（8088 不可达？）"); });
+    toast((r && r.msg) ? r.msg : ("Giới hạn nhạc online: " + n + " bài"));
+  }).catch(function () { toast("Đã lưu cục bộ nhưng chưa gửi được tới XiaoZhi (8088 không phản hồi?)"); });
+}
+
+/* P2: Chỉnh âm lượng giọng nói AI (TTS) 10..100% */
+var TTS_UI = false, TTS_T = null;
+function ttsVolLive(val) {
+  TTS_UI = true;
+  var n = Math.min(100, Math.max(10, parseInt(val, 10) || 50));
+  var lb = $("lbTtsVol");
+  if (lb) lb.textContent = n + "%";
+  if (TTS_T) clearTimeout(TTS_T);
+  TTS_T = setTimeout(function () {
+    TTS_T = null;
+    post("/api/set", "ttsVol=" + n).then(function (r) {
+      toast("Âm lượng AI: " + n + "%");
+    }).catch(function () {
+      toast("Lưu âm lượng AI thất bại");
+    });
+    setTimeout(function () { TTS_UI = false; }, 1200);
+  }, 180);
+}
+
+/* P1: Thời gian chờ tự ngắt khi rảnh (5..600s) */
+function saveIdleSec() {
+  var n = parseInt(v("inIdleSec"), 10);
+  if (isNaN(n) || n < 5) n = 5;
+  if (n > 600) n = 600;
+  $("inIdleSec").value = n;
+  post("/api/set", "idleSec=" + n).then(function (r) {
+    toast("Tự ngắt sau " + n + " giây không nói");
+    load();
+  }).catch(function () {
+    toast("Lưu thời gian chờ thất bại");
+  });
 }
 
 /* v1.3.163：自有队列 —— 8080 缺席时它就是播放页的列表数据源。
@@ -4927,7 +4909,7 @@ function syncTcTag() {
 }
 function srcTagOf(label) {
   /* 与 R1 原五分类显示一致：节目两档沿用 📖 前缀，其余保持服务端原标签 */
-  return (label === "在线节目" || label === "本地节目") ? ("📖 " + label) : label;
+  return (label === "在线节目" || label === "本地节目" || label === "Chương trình online" || label === "Chương trình nội bộ") ? ("📖 " + label) : label;
 }
 function fetchSrcLabel(u, t) {
   if (!u && !t) { return; }
@@ -4986,7 +4968,7 @@ function renderNp() {
   var ar = (MI && MI.artist) ? MI.artist : "";
   if (t !== lastTitle) {
     lastTitle = t;
-    $("npT").textContent = t || "未播放";
+    $("npT").textContent = t || "Chưa phát";
     $("npA").textContent = ar || " ";
     /* ★ pl-1.6.10：换曲 ⇒ 插值状态清零。不清就会拿上一首的进度继续累加，
        再被下一次轮询的真值硬拽回来 ⇒ 显示跳。 */
@@ -5004,7 +4986,7 @@ function renderNp() {
     LRC = null; LRCKEY = ""; LRCIDX = -1;
     if (LRCOPEN) fetchLrc(true);
   }
-  var names = { 1: "本地音乐", 2: "DLNA 推流", 3: "AirPlay", 4: "蓝牙" }; /* pl-1.6.101：PTYPE=1 已被上面的五分类接管，这里只兜 DLNA/AirPlay/蓝牙 */
+  var names = { 1: "Nhạc nội bộ", 2: "DLNA", 3: "AirPlay", 4: "Bluetooth" }; /* pl-1.6.101：PTYPE=1 已被上面的五分类接管，这里只兜 DLNA/AirPlay/蓝牙 */
   /* ★ pl-1.6.10：标签优先级 = 电台 > 在线来源 > 播放通道。
      PTYPE 只描述「声音从哪条通道出来」（本地引擎=1），分不出在线/本地曲目；
      曲目来源看 QVIA（status 的 curVia）。 */
@@ -5020,19 +5002,19 @@ function renderNp() {
      没拿到才回到原来的 QRADIO → ABL_CUR → QVIA → PTYPE 兜底链。 */
   if (SRCLBL) { setTag(srcTagOf(SRCLBL)); }
   else if (QPEND) { setTag(""); }
-  else if (QRADIO) { setTag("广播电台"); }
+  else if (QRADIO) { setTag("Đài phát thanh"); }
   /* ★ pl-1.6.141：语音点播本地书（via=abl）也要贴「本地节目」——
      以前只认网页自己记的 ABL_CUR，语音入列的本地书被 PTYPE=1 兜成「本地音乐」。 */
-  else if (ABL_CUR) { setTag("📖 本地节目"); }
+  else if (ABL_CUR) { setTag("📖 Chương trình nội bộ"); }
   /* ★ pl-1.6.141：语音点播本地书（via=abl）也要贴「本地节目」——
      以前只认网页自己记的 ABL_CUR，语音入列的本地书被 PTYPE=1 兜成「本地音乐」。 */
-  else if (QVIA === "abl") { setTag("📖 本地节目"); }
-  else if (QVIA === "program") { setTag("📖 在线节目"); }   /* pl-1.6.102：ab_* 整部入列的节目 */
-  else if (QVIA === "online" || QVIA === "rand") { setTag(npIsProgram() ? "📖 在线节目" : "在线音乐"); }
+  else if (QVIA === "abl") { setTag("📖 Chương trình nội bộ"); }
+  else if (QVIA === "program") { setTag("📖 Chương trình online"); }   /* pl-1.6.102：ab_* 整部入列的节目 */
+  else if (QVIA === "online" || QVIA === "rand") { setTag(npIsProgram() ? "📖 Chương trình online" : "Nhạc online"); }
   /* ★ pl-1.6.25：还没判明通道类型（时长未到）⇒ 干脆不显示标签。
      以前这里走到 names[1] 就写「本地曲库」，Exo 起播头半秒就被贴错，3 秒后才改口。 */
   else if (QUNK) { setTag(""); }
-  else if (PTYPE === 1) { setTag(npIsProgram() ? "📖 本地节目" : "本地音乐"); }
+  else if (PTYPE === 1) { setTag(npIsProgram() ? "📖 Chương trình nội bộ" : "Nhạc nội bộ"); }
   else if (PTYPE && names[PTYPE]) { setTag(names[PTYPE]); }
   else { setTag(""); }
   /* ★ pl-1.6.163：类型 pill 定完再跟「转码」那颗 —— 两者并排，各自独立显隐 */
@@ -5056,7 +5038,7 @@ function renderNp() {
     if (lbox) lbox.className = "lrcbox";
     LRC = null; LRCKEY = ""; LRCIDX = -1;
     var lh = $("lrcHd"), ll = $("lrcLines");
-    if (lh) lh.textContent = "电台没有歌词";
+    if (lh) lh.textContent = "Đài phát thanh không có lời";
     if (ll) ll.innerHTML = "";
   }
   paintCover();   // pl-1.6.16：有封面就盖在转碟上（电台内部会自己退回转碟）
@@ -5068,8 +5050,8 @@ function renderNp() {
   var na = $("npA");
   if (na) {
     na.textContent = (ar || " ")
-      + (PH === "idle" ? "" : (PH === "playing" ? "　·　播放中"
-         : (wait ? "　·　缓冲中" : "　·　缓冲中（可能没出声）")));
+      + (PH === "idle" ? "" : (PH === "playing" ? " · Đang phát"
+         : (wait ? " · Đang tải" : " · Đang tải (chưa có tiếng)")));
   }
 
   // ★ pl-1.5.0：外部推流（DLNA/AirPlay）没有可读的进度/时长 ⇒ 直接显示「—」，
@@ -5123,7 +5105,7 @@ function qName(it, i) {
     var ct = FAVRT[favKey(it.title || "", it.artist || it.singer || "")];
     if (ct) { return ct; }
   }
-  return it.title || it.name || ("曲目 " + (i + 1));
+  return it.title || it.name || ("Bài " + (i + 1));
 }
 /* ★ pl-1.6.152：播放队列里「未匹配上的集 / 缺集占位行」只有集号，补上书名。
    只改**显示文本**，不动 qName 返回值 —— 后者还用于 FAVRT 反查和 rlKey 重链接键，
@@ -5170,8 +5152,8 @@ function renderQueue(force) {
   if (!force && sig === qLastSig) { return; }                 // ①
   if (!use.length) {
     box.innerHTML = '<div class="note" style="margin:0">' + (wsOK
-      ? '队列为空（点「随便听」或去音乐页选台）'
-      : '还没推过列表 —— 点上面的 ▶ 就会随机来一批，或去音乐页选一首') + '</div>';
+      ? 'Danh sách phát đang trống (bấm «Nghe ngẫu nhiên» hoặc sang mục Âm nhạc)'
+      : 'Chưa có danh sách phát — bấm ▶ để phát ngẫu nhiên hoặc chọn bên Âm nhạc') + '</div>';
     qLastSig = sig; qLastListSig = lsig; qLastCur = cur;
     return;
   }
@@ -5209,7 +5191,7 @@ function renderQueue(force) {
     var miss = !!it.miss && !hid;
     if (miss) { nMiss++; }
     var sub = ar ? esc(ar) : "";
-    if (miss) { sub = (sub ? sub + " · " : "") + "自动没配上"; }
+    if (miss) { sub = (sub ? sub + " · " : "") + "Chưa khớp nguồn"; }
     /* ★ pl-1.6.74：长按过的这一行进「重链接模式」—— 标红 + 右边 🔗，
        点它进在线搜索挑版本（已经自动配上的歌也能改；不改就是原来那首）。
        ★ pl-1.6.75：**自动没配上的（it.miss）也走这一套** —— 以前点整行是 qMissTap
@@ -5220,8 +5202,8 @@ function renderQueue(force) {
         + '<div class="n">' + (it.n || (i + 1)) + "</div>"
         + '<div class="tx"><div class="a">' + esc(qShow(it, i, nm)) + "</div>"
         + '<div class="b">' + (sub ? sub + " · " : "")
-        + (rlMarked(nm, ar) ? "重链接模式：点这一行去在线挑一版，✕ 退出"
-          : "自动没配上：点这一行去在线挑一版，✕ 忽略")
+        + (rlMarked(nm, ar) ? "Liên kết lại: chạm để chọn bản online, ✕ để thoát"
+          : "Chưa khớp nguồn: chạm để chọn bản online, ✕ để ẩn")
         + "</div></div>"
         + '<div class="fix" onclick="event.stopPropagation();rlOpenQ(' + i + ')">🔗</div>'
         + '<div class="del" onclick="event.stopPropagation();rlIgnoreQ(' + i + ')">✕</div>'
@@ -5240,11 +5222,11 @@ function renderQueue(force) {
   qLastSig = sig; qLastListSig = lsig; qLastCur = cur; qLastCurAbs = curAbs;
   var tot = (Q.total || use.length);
   var qs0 = wsOK ? 0 : (Q.start || 0);
-  $("qHint").textContent = (nMiss ? "红底 = 自动没配上，点它在线挑一版 · " : "点一下即播 · ")
-    + "长按歌名可重链接 · "
+  $("qHint").textContent = (nMiss ? "Nền đỏ = chưa khớp nguồn · " : "Chạm để phát · ")
+    + "Nhấn giữ để liên kết lại · "
     + (tot > use.length
-        ? ("第 " + (qs0 + 1) + "–" + (qs0 + use.length) + " 首 / 共 " + tot + " 首")
-        : ("共 " + tot + " 首"));
+        ? ("Bài " + (qs0 + 1) + "–" + (qs0 + use.length) + " / " + tot)
+        : ("Tổng " + tot + " bài"));
 }
 /* 把队列行上的红底按**数据**重新贴一遍：
      · it.miss                      —— 播到才解析但没配上（device 标回来的）
@@ -5281,7 +5263,7 @@ function queueScrollTo(box, i) {
 function jumpCur() {
   var box = $("queue");
   var cur = wsOK ? PIDX : (Q.cur == null ? -1 : (Q.cur - (Q.start || 0)));
-  if (cur < 0 || !box.children[cur]) { toast("还没在播，没法定位"); return; }
+  if (cur < 0 || !box.children[cur]) { toast("Hiện không có bài đang phát"); return; }
   if (box.scrollHeight <= box.clientHeight + 4) {
     window.scrollTo(0, box.children[cur].getBoundingClientRect().top
       + (window.pageYOffset || 0) - 120);
@@ -5298,13 +5280,13 @@ function jumpCur() {
 /* i = 列表里的位置，real = 真实曲库下标（窗口化后两者不再相等） */
 function playAt(i, real) {
   var abs = (typeof real === "number") ? real : i;
-  if (DEMO) { toast("演示模式：不真的播放"); return; }
+  if (DEMO) { toast("Chế độ demo"); return; }
   if (wsOK && WS && WS.readyState === 1) {
-    if (abs === PIDX) { toast("已经在播这首了"); return; }
+    if (abs === PIDX) { toast("Đang phát bài này rồi"); return; }
     try {
       WS.send(JSON.stringify({ type: "play", index: i }));
-    } catch (e) { toast("发送失败：" + e); return; }
-    toast("播放第 " + (i + 1) + " 首…");
+    } catch (e) { toast("Gửi lệnh thất bại: " + e); return; }
+    toast("Đang phát bài số " + (i + 1) + "…");
     setTimeout(function () { wsAsk("get_info"); wsAsk("list"); }, 1500);
     return;
   }
@@ -5313,7 +5295,7 @@ function playAt(i, real) {
   //   拦死（实际什么都没播）。只在本地真在播放时才拦。
   var mm = S.music || {};
   var localPlaying = !!mm.playing && !(mm.ext && mm.ext.playing);
-  if (abs === (Q.cur == null ? -1 : Q.cur) && localPlaying) { toast("已经在播这首了"); return; }
+  if (abs === (Q.cur == null ? -1 : Q.cur) && localPlaying) { toast("Đang phát bài này rồi"); return; }
   act("play_at", "index=" + (abs + 1)).then(function () {
     setTimeout(function () { loadQueue(); load(); }, 1500);
   });
@@ -5332,7 +5314,7 @@ function playOrRandom() {
     //   以前这里会先试 replay —— device 拿它落盘的那份曲名回库反查、把上一首重新推起来。
     //   但「player 重启后播放页已经把上一次的曲目信息清空了」，再偷偷播回上一首
     //   等于记录还在、自相矛盾 ⇒ 去掉：重启就是重来，点 ▶ = 随机一批。
-    toast("队列是空的 —— 随机来一批");
+    toast("Hàng đợi trống — phát ngẫu nhiên");
     act("random", randomExtra());
     setTimeout(function () { load(); loadQueue(); }, 1800);
     setTimeout(function () { load(); loadQueue(); }, 4500);
@@ -5402,8 +5384,8 @@ function wsDemo() {
   wsOK = true;
   $("wsPill").textContent = "DEMO";
   $("wsPill").style.color = "var(--warn)";
-  $("npNote").textContent = "演示模式（?demo=1）：数据为假，仅用于看 UI";
-  $("volHint").textContent = "演示";
+  $("npNote").textContent = "Chế độ xem thử (?demo=1)";
+  $("volHint").textContent = "Demo";
   MI = { title: "Make Me Alive", artist: "Landslide Crew", duration: 225071, position: 61000 };
   PSTATE = true; PTYPE = 1; PH = "playing"; MDUR = "3:38"; PR_OK = true;
   PLIST = [
@@ -5432,7 +5414,7 @@ function wsDemo() {
   for (var i = 0; i < gd.length; i++) {
     (function (el) {
       el.onclick = function () {
-        if (gainLocked()) { toast("ALC 已开启，固定增益不参与"); return; }
+        if (gainLocked()) { toast("ALC đang bật nên mức Gain cố định không áp dụng"); return; }
         setKV("gain", el.getAttribute("data-v"));
       };
     })(gd[i]);
@@ -5541,17 +5523,17 @@ function ebSetClearBtn() {
   ebSearched = true;
   ebSearchedQ = ($('ebQ').value || '').trim();
   var b = document.getElementById('ebSearchBtn');
-  if (b) b.textContent = '清空';
+  if (b) b.textContent = 'Xóa';
 }
 function ebRevertSearchBtn() {
   ebSearched = false; ebSearchedQ = '';
   var b = document.getElementById('ebSearchBtn');
-  if (b) b.textContent = '搜索';
+  if (b) b.textContent = 'Tìm';
 }
 function ebClearSearch() {
   var e = document.getElementById('ebQ'); if (e) e.value = '';
   $('ebResults').innerHTML = '<div class="note" style="margin:0">—</div>';
-  $('ebHint').textContent = '搜索只列书名版本（不拉集），点书名弹窗选集、搜内部集数点播。';
+  $('ebHint').textContent = 'Tìm kiếm chỉ liệt kê đầu sách, chạm tên sách để chọn tập.';
   ebPendingQ = '';            /* 作废还在飞的搜索 */
   ebViewQ = '';               /* 结果区已回到空态 */
   ebRevertSearchBtn();
@@ -5561,8 +5543,8 @@ function ebSearch() {
   if (!q) return;
   ebPendingQ = q;
   ebViewQ = q;
-  $('ebHint').textContent = '搜索中…';
-  $('ebResults').innerHTML = '<div class="note">搜索中…</div>';
+  $('ebHint').textContent = 'Đang tìm…';
+  $('ebResults').innerHTML = '<div class="note">Đang tìm…</div>';
   fetch('/api/absearch', {method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({q:q})})
     .then(function(){ return ebPollSearch(); });
@@ -5575,20 +5557,20 @@ function ebPollSearch() {
     if (!want || want !== ebPendingQ
         || ($('ebQ').value || '').trim() !== want) { return; }
     if (d.state === 'err') {
-      $('ebHint').textContent = d.msg || '搜索失败';
-      $('ebResults').innerHTML = '<div class="note">' + esc(d.msg || '搜索失败') + '</div>';
+      $('ebHint').textContent = d.msg || 'Tìm thất bại';
+      $('ebResults').innerHTML = '<div class="note">' + esc(d.msg || 'Tìm thất bại') + '</div>';
       ebPendingQ = '';
       ebSetClearBtn();
       return;
     }
-    $('ebHint').textContent = d.msg || ('找到 ' + (d.books ? d.books.length : 0) + ' 本');
+    $('ebHint').textContent = d.msg || ('Tìm thấy ' + (d.books ? d.books.length : 0) + ' bộ');
     ebRenderBooks(d.books || []);
     ebPendingQ = '';
     ebSetClearBtn();
-  }).catch(function(){ $('ebHint').textContent = '搜索失败'; });
+  }).catch(function(){ $('ebHint').textContent = 'Tìm thất bại'; });
 }
 function ebRenderBooks(books) {
-  if (!books.length) { $('ebResults').innerHTML = '<div class="note">没搜到，换个说法再试</div>'; return; }
+  if (!books.length) { $('ebResults').innerHTML = '<div class="note">Không tìm thấy kết quả</div>'; return; }
   var h = '';
   for (var i = 0; i < books.length; i++) {
     var b = books[i];
@@ -5596,8 +5578,8 @@ function ebRenderBooks(books) {
     h += '<div style="border-top:1px solid rgba(255,255,255,.08);padding:8px 0">';
     h += '  <div style="display:flex;align-items:center;gap:8px">';
     h += '    <a href="javascript:void(0)" onclick="ebOpenModal(&quot;' + encJs(aid) + '&quot;,&quot;' + encJs(name) + '&quot;,&quot;' + encJs(nar) + '&quot;,' + cnt + ',0)" style="flex:1;font-weight:600;color:#fff;text-decoration:none">' + esc(name) + '</a>';
-    h += '    <span class="hint">' + esc(nar) + ' · ' + cnt + '集</span>';
-    h += '    <button class="btn sm" onclick="ebFav(&quot;' + encJs(name) + '&quot;,&quot;' + encJs(nar) + '&quot;,&quot;' + encJs(aid) + '&quot;,&quot;' + esc(b.source || '') + '&quot;,' + cnt + ')">☆ 收藏</button>';
+    h += '    <span class="hint">' + esc(nar) + ' · ' + cnt + ' tập</span>';
+    h += '    <button class="btn sm" onclick="ebFav(&quot;' + encJs(name) + '&quot;,&quot;' + encJs(nar) + '&quot;,&quot;' + encJs(aid) + '&quot;,&quot;' + esc(b.source || '') + '&quot;,' + cnt + ')">☆ Lưu</button>';
     h += '  </div></div>';
   }
   $('ebResults').innerHTML = h;
@@ -5611,11 +5593,11 @@ function ebOpenModal(aid, name, nar, cnt, fromProg) {
   ov.innerHTML = '<div class="modal" style="width:440px">'
     + '<div class="modal-t">' + esc(name) + ' <span class="hint">' + esc(nar) + '</span></div>'
     + '<div class="inline" style="margin:8px 0 4px">'
-    +   '<input type="text" id="ebModQ" placeholder="搜内部集数/标题，如 350 或 关键词" oninput="ebModSearch()" onkeydown="if(event.keyCode===13){ebModSearch(1)}">'
-    +   '<button class="btn sm" onclick="ebModSearch(1)">搜</button>'
+    +   '<input type="text" id="ebModQ" placeholder="Tìm số tập / tiêu đề" oninput="ebModSearch()" onkeydown="if(event.keyCode===13){ebModSearch(1)}">'
+    +   '<button class="btn sm" onclick="ebModSearch(1)">Tìm</button>'
     + '</div>'
     + '<div class="modal-list" id="ebModList"></div>'
-    + '<div class="modal-foot"><button class="btn" onclick="ebModClose()">关闭</button></div>'
+    + '<div class="modal-foot"><button class="btn" onclick="ebModClose()">Đóng</button></div>'
     + '</div>';
   document.body.appendChild(ov);
   ov.onclick = function (e) { if (e.target === ov) ebModClose(); };
@@ -5670,7 +5652,7 @@ function ebModClose() {
   ebMod = null;
 }
 function ebModFetch(pg, append) {
-  if (!append) { var el = $('ebModList'); if (el) el.innerHTML = '<div class="note">加载中…</div>'; }
+  if (!append) { var el = $('ebModList'); if (el) el.innerHTML = '<div class="note">Đang tải…</div>'; }
   fetch('/api/abepisodes', {method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({albumId:ebMod.aid, book:ebMod.name, page:pg})})
     .then(function(){ ebPollModEps(pg, append); });
@@ -5679,7 +5661,7 @@ function ebPollModEps(pg, append) {
   fetch('/api/abepisodes/result?albumId=' + encodeURIComponent(ebMod.aid) + '&page=' + pg)
     .then(function(r){return r.json();}).then(function(d){
       if (d.state === 'pending') { setTimeout(function(){ ebPollModEps(pg, append); }, 700); return; }
-      if (d.state === 'err') { $('ebModList').innerHTML = '<div class="note">' + esc(d.msg || '加载失败') + '</div>'; return; }
+      if (d.state === 'err') { $('ebModList').innerHTML = '<div class="note">' + esc(d.msg || 'Tải thất bại') + '</div>'; return; }
       var eps = d.episodes || [];
       var seen = {}; if (append) { for (var k = 0; k < ebMod.eps.length; k++) seen[ebMod.eps[k].ep] = 1; }
       for (var i = 0; i < eps.length; i++) {
@@ -5688,7 +5670,7 @@ function ebPollModEps(pg, append) {
       ebMod.hasMore = !!d.hasMore; ebMod.nextPage = pg + 1;
       ebMod.rev = d.rev || 0; ebMod.source = d.source || 'kw';   /* ★ pl-1.6.151 */
       ebModRender();
-    }).catch(function(){ $('ebModList').innerHTML = '<div class="note">加载失败</div>'; });
+    }).catch(function(){ $('ebModList').innerHTML = '<div class="note">Tải thất bại</div>'; });
 }
 function ebModSearch(jump) {
   var q = ($('ebModQ').value || '').trim(); ebMod.q = q;
@@ -5727,10 +5709,10 @@ function ebModRender() {
       if (m.eps[zi].ep === m.lastEp) { feRid = m.eps[zi].rid || ''; feSrc = m.eps[zi].source || ''; if (!feTitle) feTitle = m.eps[zi].title || ''; break; }
     }
     h += '<div style="background:rgba(56,139,253,.16);border:1px solid rgba(56,139,253,.4);border-radius:8px;padding:8px 10px;margin-bottom:8px">';
-    h += '  <div style="font-size:12px;color:#7fb2ff;margin-bottom:3px">最近播放（续播往前推 10 秒）</div>';
+    h += '  <div style="font-size:12px;color:#7fb2ff;margin-bottom:3px">Nghe gần đây (lùi lại 10 giây khi nghe tiếp)</div>';
     h += '  <div style="display:flex;align-items:center;gap:8px">';
-    h += '    <span style="flex:1">第' + m.lastEp + '集 ' + feTitle + ' <span class="hint">（' + fmtMMSS(m.lastPos) + '）</span></span>';
-    h += '    <button class="btn sm" onclick="ebPlay(&quot;' + encJs(m.name) + '&quot;,&quot;' + encJs(m.nar) + '&quot;,&quot;' + encJs(m.aid) + '&quot;,' + m.lastEp + ',&quot;' + encJs(feRid) + '&quot;,&quot;' + encJs(feSrc) + '&quot;,&quot;' + encJs(feTitle) + '&quot;)">▶ 续播</button>';
+    h += '    <span style="flex:1">Tập ' + m.lastEp + ' ' + feTitle + ' <span class="hint">(' + fmtMMSS(m.lastPos) + ')</span></span>';
+    h += '    <button class="btn sm" onclick="ebPlay(&quot;' + encJs(m.name) + '&quot;,&quot;' + encJs(m.nar) + '&quot;,&quot;' + encJs(m.aid) + '&quot;,' + m.lastEp + ',&quot;' + encJs(feRid) + '&quot;,&quot;' + encJs(feSrc) + '&quot;,&quot;' + encJs(feTitle) + '&quot;)">▶ Nghe tiếp</button>';
     h += '  </div></div>';
   }
   for (var i = 0; i < list.length; i++) {
@@ -5739,30 +5721,30 @@ function ebModRender() {
     if (/^第\s*\d+\s*集$/.test(et)) et = '';   /* ★ pl-1.6.151：服务端 v1.7.9 缺集行只给集号，别重复拼一遍 */
     var miss = !!e.missing || !(e.rid || '');
     h += '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid rgba(255,255,255,.06)">';
-    h += '  <span style="flex:1;font-size:13px">第' + e.ep + '集 ' + esc(et)
-       + (miss ? ' <span style="color:#e6a23c;font-size:11px">· 暂无源，点播放重试</span>' : '')
-       + (isLast ? ' <span style="color:#7fb2ff">· 最近</span>' : '') + '</span>';
-    h += '  <button class="btn sm" onclick="ebPlay(&quot;' + encJs(m.name) + '&quot;,&quot;' + encJs(m.nar) + '&quot;,&quot;' + encJs(m.aid) + '&quot;,' + e.ep + ',&quot;' + encJs(e.rid || '') + '&quot;,&quot;' + encJs(e.source || '') + '&quot;,&quot;' + encJs(e.title || '') + '&quot;)">播放</button>';
+    h += '  <span style="flex:1;font-size:13px">Tập ' + e.ep + ' ' + esc(et)
+       + (miss ? ' <span style="color:#e6a23c;font-size:11px">· Chưa có nguồn, chạm để thử lại</span>' : '')
+       + (isLast ? ' <span style="color:#7fb2ff">· Gần đây</span>' : '') + '</span>';
+    h += '  <button class="btn sm" onclick="ebPlay(&quot;' + encJs(m.name) + '&quot;,&quot;' + encJs(m.nar) + '&quot;,&quot;' + encJs(m.aid) + '&quot;,' + e.ep + ',&quot;' + encJs(e.rid || '') + '&quot;,&quot;' + encJs(e.source || '') + '&quot;,&quot;' + encJs(e.title || '') + '&quot;)">Phát</button>';
     h += '</div>';
   }
   if (m.local) {
     var fl = 0;
     for (var fi = 0; fi < m.cache.length; fi++) { var ce = m.cache[fi]; if (ce && (ce.filled || ce.rid)) { fl++; } }
-    h += '<div class="note" style="color:#7fb2ff;margin-bottom:6px">本地缓存秒开 · ' + m.cache.length
-       + ' 集（已绑源 ' + fl + ' 集，其余点播自动现搜）</div>';
+    h += '<div class="note" style="color:#7fb2ff;margin-bottom:6px">Bộ nhớ đệm · ' + m.cache.length
+       + ' tập (đã có nguồn ' + fl + ' tập)</div>';
   }
   if (m.local) {
     if (m.eps.length < m.cache.length) {
-      h += '<button class="btn sm" onclick="ebModLocalMore()">加载更多（本地 ' + m.eps.length + '/' + m.cache.length + '）</button>';
+      h += '<button class="btn sm" onclick="ebModLocalMore()">Tải thêm (' + m.eps.length + '/' + m.cache.length + ')</button>';
     } else if (m.eps.length >= EB_EPS_MAX && m.cache.length > EB_EPS_MAX) {
-      h += '<div class="note">已显示 ' + m.eps.length + '/' + m.cache.length + ' 集 —— 用上面的搜索框直达某一集</div>';
+      h += '<div class="note">Đã hiển thị ' + m.eps.length + '/' + m.cache.length + ' tập — dùng ô tìm kiếm ở trên để nhảy nhanh</div>';
     }
   } else if (m.hasMore && !q && m.eps.length < Math.min(m.total || 0, EB_EPS_MAX)) {
-    h += '<button class="btn sm" onclick="ebModFetch(' + m.nextPage + ',true)">加载更多（已 ' + m.eps.length + '/' + (m.total || 0) + '）</button>';
+    h += '<button class="btn sm" onclick="ebModFetch(' + m.nextPage + ',true)">Tải thêm (' + m.eps.length + '/' + (m.total || 0) + ')</button>';
   } else if (!m.local && m.eps.length >= EB_EPS_MAX) {
-    h += '<div class="note">已显示前 ' + EB_EPS_MAX + ' 集上限</div>';
+    h += '<div class="note">Đã hiển thị tối đa ' + EB_EPS_MAX + ' tập đầu</div>';
   } else if (!list.length) {
-    h += '<div class="note">没有匹配的集</div>';
+    h += '<div class="note">Không có tập phù hợp</div>';
   }
   $('ebModList').innerHTML = h;
 }
@@ -5779,7 +5761,7 @@ function ebPlay(name, nar, aid, ep, rid, src, title) {
      这几种脏占位文案一律先问服务端一次（该集真有源时纯缓存返回，不回源）。 */
   var stale = !rid || /缺集|上游没有第/.test(title || '') || /^第\s*\d+\s*集$/.test(title || '');
   if (stale && aid && ep > 0) {
-    toast('正在为第' + ep + '集找源…');
+    toast('Đang tìm nguồn cho tập ' + ep + '…');
     fetch('/api/abep', {method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({albumId:aid, book:name, ep:ep})})
       .then(function(r){return r.json();}).then(function(d){
@@ -5790,9 +5772,9 @@ function ebPlay(name, nar, aid, ep, rid, src, title) {
                 source:d.source || src, missing:false, rescued:true}]);
           }
         } else {
-          toast('第' + ep + '集暂时没有源，稍后再试');
+          toast('Tập ' + ep + ' tạm thời chưa có nguồn');
         }
-      }).catch(function(){ toast('救援失败，稍后再试'); });
+      }).catch(function(){ toast('Tìm nguồn thất bại, thử lại sau'); });
     return;
   }
   ebPlayNow(name, nar, aid, ep, rid, src, title);
@@ -5806,7 +5788,7 @@ function ebPlayNow(name, nar, aid, ep, rid, src, title) {
         body: JSON.stringify({book:name, narrator:nar, albumId:aid, ep:ep, pos:resumePos,
             rid: rid || '', source: src || '', title: title || ''})})
     .then(function(r){return r.json();}).then(function(d){
-      toast(d.msg || '已发送');
+      toast(d.msg || 'Đã gửi');
       if (pe) { pe.lastEp = ep; if (resumePos > 0) pe.lastPos = resumePos; }
       if (ebMod && ebMod.aid === aid) {            // 弹窗开着 → 实时刷新「最近播放」行
         ebMod.lastEp = ep; ebMod.lastPos = (pe && pe.lastPos) || 0;
@@ -5866,32 +5848,32 @@ setInterval(function(){
 function ebFav(name, nar, aid, src, cnt) {
   fetch('/api/prog/add', {method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({book:name, narrator:nar, albumId:aid, source:src, count:cnt})})
-    .then(function(r){return r.json();}).then(function(d){ toast(d.msg || '已收藏'); ebLoadProg(); });
+    .then(function(r){return r.json();}).then(function(d){ toast(d.msg || 'Đã lưu'); ebLoadProg(); });
 }
 function ebUnfavAsk(aid) {
   var b = ebProgMap[aid] || {};
-  var nm = b.book || "这本节目";
-  uiConfirm("确定从「在线节目」移除《" + nm + "》？\n\n移除后它的「最近播放」集数 / 秒数记忆会一起删掉，\n之后语音点播将不再优先这个收藏版本。",
+  var nm = b.book || "chương trình này";
+  uiConfirm("Xóa «" + nm + "» khỏi Chương trình online?\n\nTiến độ nghe gần nhất cũng sẽ bị xóa.",
     function () { ebUnfav(aid); },
-    { title: "取消收藏", ok: "确定移除", cancel: "再想想", danger: true });
+    { title: "Bỏ lưu", ok: "Xóa", cancel: "Hủy", danger: true });
 }
 function ebUnfav(aid) {
   fetch('/api/prog/del', {method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({albumId:aid})})
-    .then(function(r){return r.json();}).then(function(d){ toast(d.msg || '已取消'); ebLoadProg(); });
+    .then(function(r){return r.json();}).then(function(d){ toast(d.msg || 'Đã xóa'); ebLoadProg(); });
 }
 function ebLoadProg(cb) {
   fetch('/api/prog').then(function(r){return r.json();}).then(function(d){
     var list = (d && d.list) ? d.list : [];
     var c = $('ebProg'); ebProgMap = {}; ebProgTs = Date.now();
-    if (!list.length) { c.innerHTML = '<div class="note">还没有收藏的节目</div>'; paintFavCur(); if (cb) cb(); return; }
+    if (!list.length) { c.innerHTML = '<div class="note">Chưa lưu chương trình nào</div>'; paintFavCur(); if (cb) cb(); return; }
     var h = '';
     for (var i = 0; i < list.length; i++) {
       var b = list[i]; var aid = b.albumId || ''; ebProgMap[aid] = b;
       h += '<div style="border-top:1px solid rgba(255,255,255,.08);padding:8px 0">';
       h += '  <div style="display:flex;align-items:center;gap:8px">';
       h += '    <a href="javascript:void(0)" onclick="ebOpenModal(&quot;' + encJs(aid) + '&quot;,&quot;' + encJs(b.book || '') + '&quot;,&quot;' + encJs(b.narrator || '') + '&quot;,' + (b.count || 0) + ',1)" style="flex:1;font-weight:600;color:#fff;text-decoration:none">' + esc(b.book || '') + '</a>';
-      h += '    <span class="hint">' + esc(b.narrator || '') + (b.lastEp > 0 ? (' · 第' + b.lastEp + '集') : '') + '</span>';
+      h += '    <span class="hint">' + esc(b.narrator || '') + (b.lastEp > 0 ? (' · Tập ' + b.lastEp) : '') + '</span>';
       h += '    <div class="del" onclick="event.stopPropagation();ebUnfavAsk(&quot;' + encJs(aid) + '&quot;)">✕</div>';
       h += '  </div></div>';
     }
@@ -5947,8 +5929,8 @@ setInterval(function(){
 function ebFavCur() {
   fetch('/api/prog/addcur', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'})
     .then(function(r){return r.json();})
-    .then(function(d){ toast(d.msg || '已操作'); ebLoadProg(); paintFavCur(); })
-    .catch(function(){ toast('操作失败（小智没回应）'); });
+    .then(function(d){ toast(d.msg || 'Đã thực hiện'); ebLoadProg(); paintFavCur(); })
+    .catch(function(){ toast('Thao tác thất bại (XiaoZhi không phản hồi)'); });
 }
 function ebBookKey(s){   /* 与 device Prog.norm 同口径的归一化（比对照着判书名） */
   return String(s||'').replace(/[\s\u3000《》〈〉（）()【】\[\]"'“”‘’，。、：:！!？?~～|\/\\.#\-_]/g,'').toLowerCase();
@@ -5982,13 +5964,13 @@ function ablSearchBtn() {
   if (ablSearched) {                      // 已搜过 ⇒ 这个按钮是「清空」
     ablSearched = false; ablSearchedQ = '';
     var e = $('ablQ'); if (e) e.value = '';
-    $('ablBtn').textContent = '搜索';
+    $('ablBtn').textContent = 'Tìm';
     ablLoad('');
     return;
   }
   var q = ($('ablQ').value || '').trim();
   if (!q) { ablLoad(''); return; }
-  ablSearched = true; ablSearchedQ = q; $('ablBtn').textContent = '清空';
+  ablSearched = true; ablSearchedQ = q; $('ablBtn').textContent = 'Xóa';
   ablLoad(q);
 }
 /* ★ pl-1.6.140：与在线节目同款状态机 —— 以前本地这一栏只有「清空」按钮能复位，
@@ -6006,14 +5988,14 @@ function ablSearchInput() {
     /* 删空 ⇒ 只要列表还停在过滤结果上（或还有请求在飞）就回全列表 */
     if (ablViewQ !== '' || ablSearched || ablPendingQ) {
       ablSearched = false; ablSearchedQ = '';
-      $('ablBtn').textContent = '搜索';
+      $('ablBtn').textContent = 'Tìm';
       ablLoad('');
     }
     return;
   }
   if (ablSearched && v !== ablSearchedQ) {   // 改了词 ⇒ 按钮回「搜索」，点了搜新词
     ablSearched = false; ablSearchedQ = '';
-    $('ablBtn').textContent = '搜索';
+    $('ablBtn').textContent = 'Tìm';
   }
 }
 
@@ -6036,11 +6018,11 @@ function ablJs(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch
 
 function ablRenderBooks(list, dir, off, note) {
   ablBooks = list || [];
-  var t = off ? '本地有声书库已在 NAS 设置页关闭'
-              : (ablBooks.length + ' 本' + (dir ? ' · ' + dir : '') + (note ? ' · ' + note : ''));
+  var t = off ? 'Kho sách nói nội bộ đang tắt trên NAS'
+              : (ablBooks.length + ' bộ' + (dir ? ' · ' + dir : '') + (note ? ' · ' + note : ''));
   /* ★ pl-1.6.143：书多到超出 5 行半时才提示「下滑看更多」——
      列表本身封顶滚动（.progbox），但用户不一定会想到去滑那个区域。 */
-  if (!off && ablBooks.length > 6) t += ' · 下滑看更多';
+  if (!off && ablBooks.length > 6) t += ' · Cuộn xem thêm';
   $('ablHint').innerHTML = esc(t);
   ablRender(ablBooks);
 }
@@ -6071,7 +6053,7 @@ function ablLoad(q, force) {
   ablPendingQ = q;
   var c = q ? null : ablJ(ABL_BOOKS_KEY, null);
   if (c && c.list && c.list.length) {
-    ablRenderBooks(c.list, c.dir, c.off, '缓存');   /* 缓存是同步画的 ⇒ 清空当场就变 */
+    ablRenderBooks(c.list, c.dir, c.off, 'cache');   /* 缓存是同步画的 ⇒ 清空当场就变 */
     if (q) { ablFetchBooks(q, false, null); return; }
     if (force || Date.now() - (c.chk || 0) > 30000) ablFetchBooks('', true, c);
     return;
@@ -6082,12 +6064,12 @@ function ablFetchBooks(q, silent, base) {
   q = q || '';
   ablPendingQ = q;
   if (!silent) {
-    $('ablHint').textContent = '读取中…';
-    $('ablList').innerHTML = '<div class="note">读取中…</div>';
+    $('ablHint').textContent = 'Đang tải…';
+    $('ablList').innerHTML = '<div class="note">Đang tải…</div>';
   }
   fetch('/api/abl/books?q=' + encodeURIComponent(q), {method:'POST'})
     .then(function () { ablPollBooks(q, silent, base); })
-    .catch(function () { if (!silent) $('ablHint').textContent = '读取失败'; });
+    .catch(function () { if (!silent) $('ablHint').textContent = 'Tải thất bại'; });
 }
 function ablPollBooks(q, silent, base) {
   q = q || '';
@@ -6098,10 +6080,10 @@ function ablPollBooks(q, silent, base) {
     if (d.state === 'pending') { setTimeout(function () { ablPollBooks(q, silent, base); }, 450); return; }
     if (d.state === 'err') {
       if (!silent) {
-        $('ablHint').textContent = d.msg || '读取失败';
-        $('ablList').innerHTML = '<div class="note">' + esc(d.msg || '读取失败') + '</div>';
+        $('ablHint').textContent = d.msg || 'Tải thất bại';
+        $('ablList').innerHTML = '<div class="note">' + esc(d.msg || 'Tải thất bại') + '</div>';
       } else if ($('ablHint')) {
-        $('ablHint').textContent = '刷新失败，显示的是缓存';       // 静默失败：别把已有列表冲掉
+        $('ablHint').textContent = 'Làm mới thất bại, đang hiện bản lưu tạm';       // 静默失败：别把已有列表冲掉
       }
       return;
     }
@@ -6113,10 +6095,10 @@ function ablPollBooks(q, silent, base) {
       ablJs(ABL_BOOKS_KEY, base);
       return;
     }
-    ablRenderBooks(list, d.dir || '', !!d.off, silent ? '已更新' : '');
+    ablRenderBooks(list, d.dir || '', !!d.off, silent ? 'đã cập nhật' : '');
     if (!q) ablJs(ABL_BOOKS_KEY, { at: d.at || 0, chk: Date.now(),
       dir: d.dir || '', off: !!d.off, list: ablBooks });
-  }).catch(function () { if (!silent) $('ablHint').textContent = '读取失败'; });
+  }).catch(function () { if (!silent) $('ablHint').textContent = 'Tải thất bại'; });
 }
 
 /* 记忆落盘后同步缓存：列表里的「上次 第N集」、集表里的续播条都不该是旧的 */
@@ -6151,7 +6133,7 @@ function ablMemTxt(b) {
   if (!b || !b.lastEp) return '';
   /* ★ 服务端字段是 lastSub（ablocal.js books()），以前这里写的 subLast ⇒ 合集父级
      永远显示不出「（黑暗森林Ⅱ）」。v1.3.0 一并修掉。 */
-  return '上次 第' + b.lastEp + '集' + (b.lastPos ? ' ' + fmtMMSS(b.lastPos) : '')
+  return 'Lần trước: Tập ' + b.lastEp + (b.lastPos ? ' ' + fmtMMSS(b.lastPos) : '')
     + (b.lastSub ? '（' + b.lastSub + '）' : '');
 }
 
@@ -6166,7 +6148,7 @@ function ablDur(sec) {
 function ablMetaLine(b) {
   var a = [];
   if (b.author) a.push(b.author);
-  if (b.narrator) a.push('演播 ' + b.narrator);
+  if (b.narrator) a.push('Đọc: ' + b.narrator);
   if (b.year) a.push(b.year);
   if (b.durSec) a.push(ablDur(b.durSec));
   return a.join(' · ');
@@ -6178,8 +6160,7 @@ function ablMetaLine(b) {
 
 function ablRender(list) {
   if (!list.length) {
-    $('ablList').innerHTML = '<div class="note">本地书库是空的 —— 把有声书放进 NAS 的 /audiobook 目录，'
-      + '然后到 NAS 设置页点「重扫磁盘」</div>';
+    $('ablList').innerHTML = '<div class="note">Kho sách nội bộ trống (thư mục /audiobook trên NAS).</div>';
     return;
   }
   var h = '';
@@ -6190,13 +6171,13 @@ function ablRender(list) {
   for (var i = 0; i < list.length; i++) {
     var b = list[i], right = [];
     if (b.narrator) right.push(b.narrator);
-    if (b.kind === 'coll' && b.subs) right.push(b.subs.length + ' 部');
-    right.push((b.count || 0) + '集');
+    if (b.kind === 'coll' && b.subs) right.push(b.subs.length + ' phần');
+    right.push((b.count || 0) + ' tập');
     h += '<div style="border-top:1px solid rgba(255,255,255,.08);padding:8px 0">';
     h += '  <div style="display:flex;align-items:center;gap:8px">';
     h += '    <a href="javascript:void(0)" onclick="ablOpen(' + i + ')" style="flex:1;font-weight:600;color:#fff;text-decoration:none;'
       + 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
-      + esc(b.title || b.name) + (b.kind === 'coll' ? ' <span class="hint">合集</span>' : '') + '</a>';
+      + esc(b.title || b.name) + (b.kind === 'coll' ? ' <span class="hint">Tuyển tập</span>' : '') + '</a>';
     h += '    <span class="hint">' + esc(right.join(' · ')) + '</span>';
     h += '  </div></div>';
   }
@@ -6216,14 +6197,14 @@ function ablShell(title, crumb, backJs, withSearch) {
   ov.innerHTML = '<div class="modal" style="width:460px">'
     + '<div class="modal-t">' + esc(title) + (crumb ? ' <span class="hint">' + esc(crumb) + '</span>' : '') + '</div>'
     + '<div class="inline" style="margin:6px 0 4px">'
-    +   (backJs ? '<button class="btn sm" onclick="' + backJs + '">← 返回</button>' : '')
+    +   (backJs ? '<button class="btn sm" onclick="' + backJs + '">← Quay lại</button>' : '')
     +   (withSearch
-          ? '<input type="text" id="ablModQ" placeholder="搜集数/标题，如 86 或 关键词" onkeydown="if(event.keyCode===13){ablModSearch()}">'
-            + '<button class="btn sm" onclick="ablModSearch()">搜</button>'
+          ? '<input type="text" id="ablModQ" placeholder="Tìm số tập / tiêu đề" onkeydown="if(event.keyCode===13){ablModSearch()}">'
+            + '<button class="btn sm" onclick="ablModSearch()">Tìm</button>'
           : '')
     + '</div>'
     + '<div class="modal-list" id="ablModList"></div>'
-    + '<div class="modal-foot"><button class="btn" onclick="ablClose()">关闭</button></div>'
+    + '<div class="modal-foot"><button class="btn" onclick="ablClose()">Đóng</button></div>'
     + '</div>';
   document.body.appendChild(ov);
   ov.onclick = function (e) { if (e.target === ov) ablClose(); };
@@ -6237,16 +6218,16 @@ function ablOpen(i) {
 /* 合集：先列三部 / 三卷子书，每行带各自的记忆 */
 function ablOpenSubs(b) {
   ablMod = { kind: 'coll', id: b.id, name: b.name, coll: b };
-  ablShell(b.name, '合集 · 共 ' + (b.count || 0) + ' 集', '', false);
+  ablShell(b.name, 'Tuyển tập · ' + (b.count || 0) + ' tập', '', false);
   var h = '';
   for (var i = 0; i < (b.subs || []).length; i++) {
     var s = b.subs[i];
     h += '<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid rgba(255,255,255,.06)">';
     h += '  <a href="javascript:void(0)" onclick="ablOpenSub(' + i + ')" style="flex:1;color:#fff;text-decoration:none">'
       + esc(s.name) + (s.title && s.title !== s.name ? ' <span class="hint">' + esc(s.title) + '</span>' : '') + '</a>';
-    h += '  <span class="hint">' + (s.count || 0) + '集'
+    h += '  <span class="hint">' + (s.count || 0) + ' tập'
       + (s.durSec ? ' · ' + ablDur(s.durSec) : '')
-      + (s.lastEp ? ' · 第' + s.lastEp + '集 ' + fmtMMSS(s.lastPos || 0) : '') + '</span>';
+      + (s.lastEp ? ' · Tập ' + s.lastEp + ' ' + fmtMMSS(s.lastPos || 0) : '') + '</span>';
     h += '</div>';
   }
   $('ablModList').innerHTML = h;
@@ -6299,11 +6280,11 @@ function ablBackColl() {
 function ablFetchEps(page, append, silent, id) {
   var m = ablMod; if (!m) return;
   id = id || m.id;
-  if (!append && !silent) $('ablModList').innerHTML = '<div class="note">加载中…</div>';
+  if (!append && !silent) $('ablModList').innerHTML = '<div class="note">Đang tải…</div>';
   fetch('/api/abl/eps', { method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ id: id, page: page, q: m.q || '' }) })
     .then(function () { ablPollEps(page, append, silent, id); })
-    .catch(function () { if (!silent) $('ablModList').innerHTML = '<div class="note">加载失败</div>'; });
+    .catch(function () { if (!silent) $('ablModList').innerHTML = '<div class="note">Tải thất bại</div>'; });
 }
 /* 把一份结果套进当前弹窗（缓存回放和真响应共用，省得两处逻辑漂移） */
 function ablApplyEps(d, page, append) {
@@ -6330,13 +6311,13 @@ function ablPollEps(page, append, silent, id) {
       return;
     }
     if (d.state === 'err') {
-      if (!silent) $('ablModList').innerHTML = '<div class="note">' + esc(d.msg || '加载失败') + '</div>';
+      if (!silent) $('ablModList').innerHTML = '<div class="note">' + esc(d.msg || 'Tải thất bại') + '</div>';
       return;
     }
     ablApplyEps(d, page, append);
     if (page === 1 && !append && !(m.q || '')) ablEpsPut(id, d);
   }).catch(function () {
-    if (ablMod && ablMod.id === id && !silent) $('ablModList').innerHTML = '<div class="note">加载失败</div>';
+    if (ablMod && ablMod.id === id && !silent) $('ablModList').innerHTML = '<div class="note">Tải thất bại</div>';
   });
 }
 /* ★ v1.3.2：简介展开/收起（替代 <details>，见上面理由）。按钮文字跟着变，别让人以为只能开不能关。 */
@@ -6345,7 +6326,7 @@ function ablToggleDesc(a) {
   if (!d) return;
   var open = (d.style.display === 'none');
   d.style.display = open ? 'block' : 'none';
-  a.textContent = open ? '简介 ▴' : '简介 ▾';
+  a.textContent = open ? 'Giới thiệu ▴' : 'Giới thiệu ▾';
 }
 function ablRenderEps() {
   var m = ablMod; if (!m) return;
@@ -6364,7 +6345,7 @@ function ablRenderEps() {
          正文不该是那个色，用户原话「简介的字不要紫色，太刺眼」。 */
       h += '  <a href="javascript:void(0)" onclick="ablToggleDesc(this)"'
         + ' style="display:inline-block;margin-top:4px;text-decoration:none;'
-        + 'color:#9fb0c9;font-size:12px">简介 ▾</a>'
+        + 'color:#9fb0c9;font-size:12px">Giới thiệu ▾</a>'
         + '<div id="ablDescBox" style="display:none;font-size:12px;line-height:1.7;'
         + 'color:#c3cddd;white-space:pre-wrap;margin-top:4px">' + esc(m.desc) + '</div>';
     }
@@ -6374,27 +6355,27 @@ function ablRenderEps() {
     var lt = m.lastTtl || '';
     for (var z = 0; z < m.eps.length; z++) { if (m.eps[z].ep === m.lastEp) { lt = m.eps[z].title || lt; break; } }
     h += '<div style="background:rgba(56,139,253,.16);border:1px solid rgba(56,139,253,.4);border-radius:8px;padding:8px 10px;margin-bottom:8px">';
-    h += '  <div style="font-size:12px;color:#7fb2ff;margin-bottom:3px">上次听到（续播往前推 10 秒）</div>';
+    h += '  <div style="font-size:12px;color:#7fb2ff;margin-bottom:3px">Nghe lần trước (lùi 10 giây khi nghe tiếp)</div>';
     h += '  <div style="display:flex;align-items:center;gap:8px">';
-    h += '    <span style="flex:1">第' + m.lastEp + '集 ' + esc(lt) + ' <span class="hint">（' + fmtMMSS(m.lastPos) + '）</span></span>';
-    h += '    <button class="btn sm" onclick="ablResume()">▶ 续播</button>';
+    h += '    <span style="flex:1">Tập ' + m.lastEp + ' ' + esc(lt) + ' <span class="hint">(' + fmtMMSS(m.lastPos) + ')</span></span>';
+    h += '    <button class="btn sm" onclick="ablResume()">▶ Nghe tiếp</button>';
     h += '  </div></div>';
   }
   for (var k = 0; k < m.eps.length; k++) {
     var e = m.eps[k];
     h += '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid rgba(255,255,255,.06)">';
-    h += '  <span style="flex:1;font-size:13px">第' + e.ep + '集 ' + esc(e.title || '')
-      + (e.ep === m.lastEp ? ' <span style="color:#7fb2ff">· 上次</span>' : '') + '</span>';
+    h += '  <span style="flex:1;font-size:13px">Tập ' + e.ep + ' ' + esc(e.title || '')
+      + (e.ep === m.lastEp ? ' <span style="color:#7fb2ff">· Lần trước</span>' : '') + '</span>';
     if (e.dur) h += '  <span class="hint">' + ablDur(e.dur) + '</span>';
-    h += '  <button class="btn sm" onclick="ablPlayAt(' + e.ep + ')">播放</button>';
+    h += '  <button class="btn sm" onclick="ablPlayAt(' + e.ep + ')">Phát</button>';
     h += '</div>';
   }
   if (m.hasMore) {
-    h += '<button class="btn sm" style="margin-top:8px" onclick="ablMore()">加载更多（已 '
-      + m.eps.length + '/' + m.total + '）</button>';
+    h += '<button class="btn sm" style="margin-top:8px" onclick="ablMore()">Tải thêm ('
+      + m.eps.length + '/' + m.total + ')</button>';
   }
-  if (!m.eps.length) h += '<div class="note">没有匹配的集</div>';
-  h += '<div class="note">本地直连 NAS（共 ' + m.total + ' 集）· 播放时底部标签显示「📖 本地节目」</div>';
+  if (!m.eps.length) h += '<div class="note">Không có tập phù hợp</div>';
+  h += '<div class="note">Kết nối trực tiếp NAS (' + m.total + ' tập)</div>';
   $('ablModList').innerHTML = h;
 }
 function ablMore() { if (ablMod) ablFetchEps((ablMod.page || 1) + 1, true); }
@@ -6417,7 +6398,7 @@ function ablPlayAt(ep) {
     ablPlay(m.id, m.name, m.sub, ep, hit.title || '', hit.url, pos, q);
     return;
   }
-  toast('准备队列…');
+  toast('Đang chuẩn bị danh sách phát…');
   ablFetchBatch(m.id, ep, 300, function (d) {
     var items = [], first = null, k;
     if (d) {
@@ -6496,20 +6477,20 @@ function ablCurInfo() {
 /* 队首/队尾续拉：往 NAS 要「以目标集为锚点的一段集表」（最多 200 集），起播目标集那条。 */
 function ablEdge(dir) {
   var c = ablCurInfo();
-  if (!c) { toast('不知道当前听的是哪一集 —— 点书名重新选一集'); return; }
+  if (!c) { toast('Không xác định được tập hiện tại — hãy chọn lại từ đầu sách'); return; }
   var target = c.ep + dir;
-  if (target < 0) { toast('已经是第一集了'); return; }
+  if (target < 0) { toast('Đây đã là tập đầu tiên'); return; }
   /* 弹窗里知道这本书一共多少集 ⇒ 到头了就直接说，别白跑一趟 NAS */
   if (ablMod && ablMod.id === c.id && ablMod.total > 0 && target >= ablMod.total) {
-    toast('已经是最后一集了（共 ' + ablMod.total + ' 集）');
+    toast('Đây đã là tập cuối cùng (' + ablMod.total + ' tập)');
     return;
   }
   /* 往前听时把目标集放在这批的**尾部**（NAS 按 ep 定位页，锚点要留出前面的空间） */
   var anchor = dir > 0 ? target : Math.max(0, target - 199);
-  toast('📖 续接「' + (c.name || '本地书') + '」第' + target + '集…');
+  toast('📖 Đang chuyển «' + (c.name || 'Sách nội bộ') + '» tập ' + target + '…');
   ablFetchBatch(c.id, anchor, 200, function (d) {
     if (!d || !(d.episodes || []).length) {
-      toast('这一段没拉到 —— 可能已经是最后一集，或 NAS 暂时没应答');
+      toast('Không tải được tập tiếp theo — có thể đã hết hoặc NAS không phản hồi');
       return;
     }
     var items = [], i;
@@ -6517,7 +6498,7 @@ function ablEdge(dir) {
       var e = d.episodes[i];
       if (e.url) items.push({ ep: e.ep, title: e.title || '', url: e.url });
     }
-    if (!items.length) { toast('这一段没有可播地址'); return; }
+    if (!items.length) { toast('Không có đường dẫn phát'); return; }
     var at = -1;
     for (i = 0; i < items.length; i++) {
       if (dir > 0) { if (items[i].ep >= target) { at = i; break; } }
@@ -6577,7 +6558,7 @@ function ablQueue(m, ep) {
   return out;
 }
 function ablPlay(id, name, sub, ep, title, url, pos, items) {
-  if (!url) { toast('这一集没有可播地址'); return; }
+  if (!url) { toast('Tập này không có đường dẫn phát'); return; }
   var from = pos > 2 ? pos - 2 : 0;
   var q = items && items.length ? items : [{ ep: ep, title: title || '', url: url }];
   fetch('/api/ablplay', { method:'POST', headers:{'Content-Type':'application/json'},
@@ -6586,10 +6567,10 @@ function ablPlay(id, name, sub, ep, title, url, pos, items) {
     .then(function (r) { return r.json(); })
     .then(function (d) {
       ABL_CUR = { id: id, ep: ep, name: name, sub: sub || '', title: title || '', at: Date.now() };
-      toast((d && d.msg) ? d.msg : ('📖 本地节目 第' + ep + '集'));
+      toast((d && d.msg) ? d.msg : ('📖 Chương trình nội bộ · Tập ' + ep));
       ablSavePos(id, ep, from, title);
     })
-    .catch(function () { toast('播放失败（player 没应答）'); });
+    .catch(function () { toast('Phát thất bại (player không phản hồi)'); });
 }
 function ablSavePos(id, ep, pos, title) {
   /* ★ v1.3.0：写 NAS 成功后顺手把浏览器缓存里的记忆也改掉 ——

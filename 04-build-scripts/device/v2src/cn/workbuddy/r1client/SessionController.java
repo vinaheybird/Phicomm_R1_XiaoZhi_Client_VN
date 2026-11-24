@@ -189,20 +189,33 @@ public final class SessionController implements
      * ★ 每次装配计时器都**现读文件旗标**，不依赖任何广播 / 进程间时序 ——
      *   这是安卓版根治「UI 改了不生效」的做法。
      */
-    private boolean autoDisconnectOn() {
+    /**
+     * P1/P3: 默认开启自动断开（files/auto_disconnect_off 存在时才关闭）。
+     */
+    public static boolean isAutoDisconnectOn(Context ctx) {
+        if (ctx == null) {
+            return true;
+        }
         try {
-            if (new java.io.File(appContext.getFilesDir(), "auto_disconnect").exists()) {
-                return true;
+            if (new java.io.File(ctx.getFilesDir(), "auto_disconnect_off").exists()) {
+                return false;
             }
         } catch (Throwable ignored) {
         }
-        return false;
+        return true;
     }
 
-    /** files/idle&lt;N&gt;：显式指定续听窗口秒数（20..600），优先级高于上面那个开关。0 = 没指定 */
-    private long filesIdleMs() {
+    private boolean autoDisconnectOn() {
+        return isAutoDisconnectOn(appContext);
+    }
+
+    /** files/idle&lt;N&gt;：显式指定续听窗口秒数（5..600）。0 = 没指定 */
+    public static long filesIdleMs(Context ctx) {
+        if (ctx == null) {
+            return 0L;
+        }
         try {
-            java.io.File[] fs = appContext.getFilesDir().listFiles();
+            java.io.File[] fs = ctx.getFilesDir().listFiles();
             if (fs == null) {
                 return 0L;
             }
@@ -214,7 +227,7 @@ public final class SessionController implements
                 }
                 try {
                     long v = Long.parseLong(n.substring(4));
-                    if (v >= 20L && v <= 600L) {
+                    if (v >= 5L && v <= 600L) {
                         best = v * 1000L;
                     }
                 } catch (Throwable ignored) {
@@ -226,21 +239,29 @@ public final class SessionController implements
         }
     }
 
+    private long filesIdleMs() {
+        return filesIdleMs(appContext);
+    }
+
+    /** 当前配置的自动断开空闲秒数（5..600，默认 10s）。供 WebConsole 回显。 */
+    public static int getIdleSec(Context ctx) {
+        long f = filesIdleMs(ctx);
+        return f > 0L ? (int) (f / 1000L) : 10;
+    }
+
     private volatile long lastWinMs = -1L;
 
     /** 本次会话是否需要在**真正挂断那一刻**补一声（语义见 scheduleIdleAlert） */
     private volatile boolean cueOnDisconnect = false;
 
     /**
-     * 续听窗口取值优先级：files/idle&lt;N&gt; &gt; auto_disconnect 开关(60s) &gt; 默认 90s。
-     * 顺手做两件事：同步 listenIdleMs 让日志/其它读它的地方口径一致；把 ws 侧那套
-     * 独立空闲计时器拉到 24h 停掉，免得两组计时器（这里 vs XiaoZhiWs.idleCloseTask）
-     * 互相打架提前把连接掐了。
+     * 续听窗口取值优先级：auto_disconnect 开 ⇒ files/idle&lt;N&gt;（5..600s）或默认 10s；
+     * auto_disconnect 关 ⇒ 90s（让服务器先说话）。
      */
     private long idleWindowMs() {
         long f = filesIdleMs();
         boolean on = autoDisconnectOn();
-        long v = f > 0L ? f : (on ? 60000L : 90000L);
+        long v = on ? (f > 0L ? f : 10000L) : 90000L;
         listenIdleMs = v;
         if (ws != null) {
             ws.setIdleCloseDelayMs(24L * 3600L * 1000L);

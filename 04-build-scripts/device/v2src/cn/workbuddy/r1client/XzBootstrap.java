@@ -323,6 +323,17 @@ public final class XzBootstrap {
         SessionLog.i("bus wakeup register=" + wOk);
 
         // ---- 3) TTS（看门狗保护）----
+        // P2: load persisted TTS volume (10..100%, default 50%) before AudioTrack starts
+        try {
+            String tv = readLineFile("tts_vol");
+            if (tv != null && tv.length() > 0) {
+                TtsPlayer.setTtsVolPct(Integer.parseInt(tv.trim()));
+            } else {
+                TtsPlayer.setTtsVolPct(50);
+            }
+        } catch (Throwable t) {
+            Log.w(TAG, "tts_vol flag read failed", t);
+        }
         ensureTts();
 
         // ---- 4) WS / OTA / 会话控制器 ----
@@ -391,7 +402,7 @@ public final class XzBootstrap {
             AudioCapture.sessionBind = new File(app.getFilesDir(), "sess_bind").exists();
             SessionController.dumpEnabled = new File(app.getFilesDir(), "uplink_dump").exists();
             SessionController.probeEnabled = new File(app.getFilesDir(), "stereo_probe").exists();
-            int g = 16;
+            int g = 4;
             int[] cand = {1, 32, 16, 8, 4};
             for (int gi = 0; gi < cand.length; gi++) {
                 if (new File(app.getFilesDir(), "gain" + cand[gi]).exists()) { g = cand[gi]; break; }
@@ -435,13 +446,15 @@ public final class XzBootstrap {
             // v1.3.132：「小智说话时暂停音乐、说完继续」—— TTS 与音乐互斥（默认关）。
             // Web 控制台勾选 / touch files/music_pause_tts 打开。
             MusicResume.setTtsPause(new File(app.getFilesDir(), "music_pause_tts").exists());
-            // v1.3.139：自定义音乐库（默认开）。touch files/my_music_off 关掉 ⇒
-            // MCP 上报空工具表，播放音乐/电台交回小智服务器自带的那套。
-            PlayerBridge.setMyMusic(!new File(app.getFilesDir(), "my_music_off").exists());
+            // P3: 自定义音乐库默认关闭（files/my_music_on 存在时才开启），避免默认下发 28 个中文 NAS 工具及请求 192.168.2.189
+            PlayerBridge.setMyMusic(new File(app.getFilesDir(), "my_music_on").exists());
             // v1.3.147：指示灯联动（原厂灯控反射装载）。touch files/lights_off 关掉。
             R1Lights.init(app);
             String cfg = "xz audio cfg: aec=" + AudioCapture.aecEnabled
                     + " gain=" + AudioCapture.uplinkGain
+                    + " tts_vol=" + TtsPlayer.getTtsVolPct() + "%"
+                    + " auto_disconnect=" + SessionController.isAutoDisconnectOn(app)
+                    + " idle_sec=" + SessionController.getIdleSec(app)
                     + " src_vrec=" + AudioCapture.useVoiceRec
                     + " src_uni4mic=" + AudioCapture.useUni4mic
                     + " usc_tap=" + AudioCapture.useUscTap

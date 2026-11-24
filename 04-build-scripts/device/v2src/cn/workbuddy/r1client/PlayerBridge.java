@@ -399,7 +399,7 @@ public final class PlayerBridge {
      * 看不到 {@code self.r1player.*}，自然退回小智服务器自带的音乐/电台。
      * Web 卡片上的手动按钮不受影响（那是调试通道，不是小智的视野）。</p>
      */
-    private static volatile boolean myMusic = true;
+    private static volatile boolean myMusic = false;
 
     /** v1.3.139：自定义音乐库是否启用（给 MCP 工具表门禁用）。 */
     public static boolean isMyMusic() {
@@ -1843,17 +1843,20 @@ public final class PlayerBridge {
     /** 在 XzBootstrap 装配完成后调用；失败不影响小智主链路。 */
     public static synchronized boolean init(Context ctx) {
         app = (ctx == null) ? null : ctx.getApplicationContext();
+        boolean hasCustomIndex = false;
         try {
             File f = new File(app.getFilesDir(), "music_index");
             if (f.exists()) {
                 String s = readFile(f).trim();
                 if (s.length() > 0) {
                     setIndexSpec(s);
+                    hasCustomIndex = true;
                 }
             }
         } catch (Throwable t) {
             Log.w(TAG, "music_index flag read: " + t);
         }
+        final boolean shouldLoadIndex = myMusic || hasCustomIndex;
         Log.i(TAG, "player bridge init, index=" + indexUrl);
         SessionLog.i("player bridge ready, index=" + indexUrl);
         // v1.3.90 调试开关：files/dbg_play 里写一个曲名，进程启动后自动播一次。
@@ -1882,7 +1885,12 @@ public final class PlayerBridge {
                 // 越早越好。音乐活在 player 进程里，跟我们的死活无关：小智重启后
                 // 内存态全丢，以前只能答「播放列表为空」。
                 restorePlayState();
-                loadIndex();
+                if (shouldLoadIndex) {
+                    loadIndex();
+                } else {
+                    Log.i(TAG, "skip loadIndex on boot (myMusic=false, no custom music_index)");
+                    SessionLog.i("music index skipped on boot (myMusic=false)");
+                }
                 // 预热原厂消息总线（主通道）
                 msgReady();
                 // 预热：先探到 DLNA 端口，首次 tools/call 就不用等发现

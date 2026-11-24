@@ -747,7 +747,9 @@ public final class WebConsole {
             a.put("alc", AudioCapture.alcEnabled);   // v1.3.109
             a.put("log", SessionLog.isEnabled());    // v1.3.109：会话日志开关
             a.put("sound", !flagExists("sound_off"));
-            a.put("autoDisconnect", flagExists("auto_disconnect"));
+            a.put("autoDisconnect", SessionController.isAutoDisconnectOn(app));
+            a.put("idleSec", SessionController.getIdleSec(app));
+            a.put("ttsVol", TtsPlayer.getTtsVolPct());
             a.put("musicPause", MusicResume.isTtsPause());   // v1.3.132：TTS 与音乐互斥
             a.put("myMusic", PlayerBridge.isMyMusic());      // v1.3.139：自定义音乐库开关
             // v1.3.168：灯光控制（氛围灯在 ambient 段，因为它活在 player 里）
@@ -816,7 +818,7 @@ public final class WebConsole {
             }
             String g = q.get("gain");
             if (g != null) {
-                int gv = 16;
+                int gv = 4;
                 try {
                     gv = Integer.parseInt(g);
                 } catch (Throwable ignored) {
@@ -916,11 +918,57 @@ public final class WebConsole {
                 String s = PlayerBridge.dispatch("volume", a);
                 msg.append("vol=").append(vol).append("(").append(s).append(") ");
             }
+            String tv = q.get("ttsVol");
+            if (tv != null) {
+                int tvv = 50;
+                try {
+                    tvv = Integer.parseInt(tv.trim());
+                } catch (Throwable ignored) {
+                }
+                if (tvv < 10) tvv = 10;
+                if (tvv > 100) tvv = 100;
+                XzBootstrap.writeLineFile("tts_vol", String.valueOf(tvv));
+                TtsPlayer.setTtsVolPct(tvv);
+                msg.append("ttsVol=").append(tvv).append("% ");
+            }
+            String isec = q.get("idleSec");
+            if (isec != null) {
+                int iv = 10;
+                try {
+                    iv = Integer.parseInt(isec.trim());
+                } catch (Throwable ignored) {
+                }
+                if (iv < 5) iv = 5;
+                if (iv > 600) iv = 600;
+                File[] fs = app.getFilesDir().listFiles();
+                if (fs != null) {
+                    for (int i = 0; i < fs.length; i++) {
+                        String fn = fs[i].getName();
+                        if (fn != null && fn.startsWith("idle") && fn.length() > 4) {
+                            boolean digits = true;
+                            for (int k = 4; k < fn.length(); k++) {
+                                char ch = fn.charAt(k);
+                                if (ch < '0' || ch > '9') {
+                                    digits = false;
+                                    break;
+                                }
+                            }
+                            if (digits) {
+                                //noinspection ResultOfMethodCallIgnored
+                                fs[i].delete();
+                            }
+                        }
+                    }
+                }
+                writeFile(new File(app.getFilesDir(), "idle" + iv), String.valueOf(iv));
+                msg.append("idleSec=").append(iv).append("s ");
+            }
             String ad = q.get("autoDisconnect");
             if (ad != null) {
                 boolean on = "on".equals(ad);
+                setFlag("auto_disconnect_off", !on);
                 setFlag("auto_disconnect", on);
-                msg.append("autoDisconnect=").append(ad).append("(下轮会话生效) ");
+                msg.append("autoDisconnect=").append(ad).append(" ");
             }
             // v1.3.132：TTS 与音乐互斥 —— 小智每轮说话前暂停音乐，说完 2.5s 接回。
             // 每帧读取，立即生效（下一轮 TTS 就开始让路）。
@@ -931,19 +979,15 @@ public final class WebConsole {
                 MusicResume.setTtsPause(on);
                 msg.append("musicPause=").append(mp).append(" ");
             }
-            // v1.3.139：自定义音乐库开关。关 = 小智看不到 self.r1player.* 工具，
-            // 播放音乐/电台走小智服务器自带的那套（下轮唤醒生效，因为 tools/list
-            // 是每次握手时问的）。
+            // P3: 自定义音乐库开关（默认关，files/my_music_on 存在时开启）。
             String mm = q.get("myMusic");
             if (mm != null) {
                 boolean on = "on".equals(mm);
+                setFlag("my_music_on", on);
                 setFlag("my_music_off", !on);
                 PlayerBridge.setMyMusic(on);
-                // v1.3.141：服务器只在握手时问一次 tools/list，连接是复用的 ⇒
-                // 光改开关，当前这条连接手里仍是旧表（体感「要重启才生效」）。
-                // 断掉它，下一句唤醒就重新握手、按新表走（比重启进程轻）。
                 XzBootstrap.dropWs("myMusic=" + mm);
-                msg.append("myMusic=").append(mm).append("(已断开当前连接，下一句生效) ");
+                msg.append("myMusic=").append(mm).append(" ");
             }
             // v1.3.168：灯光三选二（氛围灯走 op=amb，因为它活在 player 进程里）。
             // 唤醒灯 = 24 颗拾音灯；播报灯 = 203 蓝色氛围环。只挡「开」不挡「灭」，
