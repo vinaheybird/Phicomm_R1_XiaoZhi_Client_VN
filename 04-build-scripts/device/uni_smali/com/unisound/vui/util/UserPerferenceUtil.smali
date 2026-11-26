@@ -565,7 +565,7 @@
 
     .prologue
     # jp2 v1.3.71 + VN fork: factory wakeup words ("小智小智" + VN phonetic variants:
-    #   小知小知 xiǎo zhī, 小记小记 xiǎo jì = "siao chi", 小字小字 xiǎo zì = "siao zi/di").
+    #   小知小知 xiǎo zhī, 小记小记 xiǎo jì = "siao chi").
     new-instance v1, Ljava/util/ArrayList;
 
     invoke-direct {v1}, Ljava/util/ArrayList;-><init>()V
@@ -579,10 +579,6 @@
     invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
     const-string v0, "\u5c0f\u8bb0\u5c0f\u8bb0"
-
-    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
-
-    const-string v0, "\u5c0f\u5b57\u5c0f\u5b57"
 
     invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
@@ -905,7 +901,7 @@
 
     .prologue
     # jp2 v1.3.71 + VN fork: factory wakeup words ("小智小智" + VN phonetic variants:
-    #   小知小知 xiǎo zhī, 小记小记 xiǎo jì = "siao chi", 小字小字 xiǎo zì = "siao zi/di").
+    #   小知小知 xiǎo zhī, 小记小记 xiǎo jì = "siao chi").
     new-instance v1, Ljava/util/ArrayList;
 
     invoke-direct {v1}, Ljava/util/ArrayList;-><init>()V
@@ -919,10 +915,6 @@
     invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
     const-string v0, "\u5c0f\u8bb0\u5c0f\u8bb0"
-
-    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
-
-    const-string v0, "\u5c0f\u5b57\u5c0f\u5b57"
 
     invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 

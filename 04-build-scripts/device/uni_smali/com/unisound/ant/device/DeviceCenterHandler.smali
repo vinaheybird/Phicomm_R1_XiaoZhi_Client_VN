@@ -334,7 +334,7 @@
 
     .line 531
     :cond_29
-    const/16 v1, 0xa
+    const/16 v1, 0x8
 
     if-ge v0, v1, :cond_30
 

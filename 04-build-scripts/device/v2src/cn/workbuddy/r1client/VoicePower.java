@@ -110,8 +110,8 @@ public final class VoicePower {
     /** Apply sWakeThr to ANTConfigPreference static fields (+ native engine option if available). */
     public static void applyWakeThr(String why) {
         float thr = sWakeThr;
-        float m1 = Math.max(-28.5f, Math.round((thr - 1.5f) * 10.0f) / 10.0f);
-        float m2 = Math.max(-28.5f, Math.round((thr - 2.5f) * 10.0f) / 10.0f);
+        float m1 = Math.max(-28.5f, Math.round((thr - 1.0f) * 10.0f) / 10.0f);
+        float m2 = Math.max(-28.5f, Math.round((thr - 2.0f) * 10.0f) / 10.0f);
         float m3 = Math.max(-28.5f, Math.round((thr - 3.5f) * 10.0f) / 10.0f);
         float eff = thr;
         try {
@@ -121,7 +121,7 @@ public final class VoicePower {
                 int vol = (am != null) ? am.getStreamVolume(AudioManager.STREAM_MUSIC) : 4;
                 if (vol >= 12) {
                     eff = m3;
-                } else if (vol >= 10) {
+                } else if (vol >= 8) {
                     eff = m2;
                 } else if (vol >= 1) {
                     eff = m1;
@@ -157,6 +157,64 @@ public final class VoicePower {
             } catch (Throwable ignored) {
             }
         }
+    }
+
+    /**
+     * smali hook from NLUDispatcher.onWakeupResult: anti-false-wakeup gate during music & chatter.
+     * - Tightens secondary variant "小知小知" by +1.5 (real calls hit ~-8.8, chatter false-triggers ~-17).
+     * - Rejects stretched (>1400ms) or micro (<450ms) alignments when score is weak (< -12.0).
+     */
+    public static boolean acceptWakeup(String word, float score, float benchmark, String rawJson) {
+        float effThr = benchmark;
+        if ("\u5c0f\u77e5\u5c0f\u77e5".equals(word)) {
+            effThr = benchmark + 1.5f;
+        }
+        if (score <= effThr) {
+            if (score > benchmark) {
+                Log.i(TAG, "VoicePower: wakeup reject margin word=" + word
+                        + " score=" + score + " <= " + effThr + " (base=" + benchmark + ")");
+                SessionLog.i("wakeup filtered (variant margin): " + word
+                        + " score=" + score + " thr=" + effThr);
+            }
+            return false;
+        }
+        int uttMs = parseJsonInt(rawJson, "\"utteranceTime\":");
+        if (uttMs > 0 && score < -12.0f && (uttMs > 1400 || uttMs < 450)) {
+            Log.i(TAG, "VoicePower: wakeup reject chatter word=" + word
+                    + " score=" + score + " uttMs=" + uttMs + " thr=" + effThr);
+            SessionLog.i("wakeup filtered (chatter utt=" + uttMs + "ms): " + word
+                    + " score=" + score);
+            return false;
+        }
+        return true;
+    }
+
+    private static int parseJsonInt(String json, String key) {
+        if (json == null || key == null) {
+            return -1;
+        }
+        int i = json.indexOf(key);
+        if (i < 0) {
+            return -1;
+        }
+        int p = i + key.length();
+        int n = json.length();
+        while (p < n && (json.charAt(p) == ' ' || json.charAt(p) == '\t')) {
+            p++;
+        }
+        int val = 0;
+        boolean any = false;
+        while (p < n) {
+            char c = json.charAt(p);
+            if (c >= '0' && c <= '9') {
+                val = val * 10 + (c - '0');
+                any = true;
+                p++;
+            } else {
+                break;
+            }
+        }
+        return any ? val : -1;
     }
 
     private static void setStaticFloat(Class<?> cls, String name, float val) {

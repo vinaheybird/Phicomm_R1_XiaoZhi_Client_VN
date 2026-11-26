@@ -1360,7 +1360,9 @@
 
     move-result v4
 
-    invoke-direct {p0, v4}, Lcom/unisound/vui/handler/filter/NLUDispatcher;->b(F)Z
+    sget v5, Lcom/unisound/vui/common/config/ANTConfigPreference;->effectWakeupBenchmark:F
+
+    invoke-static {v3, v4, v5, p2}, Lcn/workbuddy/r1client/VoicePower;->acceptWakeup(Ljava/lang/String;FFLjava/lang/String;)Z
 
     move-result v4
 
