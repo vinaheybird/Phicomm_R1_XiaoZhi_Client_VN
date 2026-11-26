@@ -1463,7 +1463,7 @@ public final class SessionController implements
      */
     @Override
     public void onWakeup(String word) {
-        lastWakeWord = word;      // v1.3.21：留档供 detect 上报
+        lastWakeWord = "小智小智";      // v1.3.21 + VN fork: normalize phonetic wakeup variants for detect report
         handleWakeup("bus:" + word, true);
     }
 

@@ -269,7 +269,7 @@
 
     iput-boolean v3, p0, Lcom/unisound/sdk/bg;->N:Z
 
-    const/4 v0, 0x5
+    const/16 v0, 0xa
 
     iput v0, p0, Lcom/unisound/sdk/bg;->ap:I
 

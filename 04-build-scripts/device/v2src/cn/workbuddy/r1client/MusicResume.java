@@ -148,6 +148,8 @@ public final class MusicResume {
     private static volatile boolean userPaused = false;
     /** 本轮已执行过恢复，防重复 */
     private static volatile boolean fired = false;
+    /** VN fork: 已在唤醒瞬间立即暂停音乐（确保收音安静，不再等到 TTS 首帧才停） */
+    private static volatile boolean pausedOnWakeup = false;
     /** v1.3.133/134：唤醒让路已挂起（音乐还在播），等小智开口才真停 */
     private static volatile boolean deferPending = false;
     /**
@@ -259,6 +261,7 @@ public final class MusicResume {
         enabled = on;
         if (!on) {
             pending = false;
+            pausedOnWakeup = false;
             cancel();
             cancelDefer();
         }
@@ -342,18 +345,34 @@ public final class MusicResume {
         // 不会覆盖这里，见 deferPause 里的 deferPending 分支。）
         wakeCueTs = 0L;          // v1.3.144：新一轮，清掉上一轮的应答音/服务器 TTS 标记
         serverTtsSeen = false;
+        pausedOnWakeup = false;
         boolean active = PlayerBridge.isMusicActive();
+        boolean fresh = PlayerBridge.isSoftPlayingFresh();
+        if (active || fresh) {
+            cancelDefer();
+            boolean ok = PlayerBridge.pauseMusic();
+            pausedOnWakeup = true;
+            markPaused("wakeup", ok);
+            Log.i(TAG, "onWakeup: immediate pause musicActive=" + active
+                    + " soft=" + PlayerBridge.isSoftPlaying() + " fresh=" + fresh
+                    + " sent=" + ok);
+            SessionLog.i("music wakeup-yield armed: 唤醒瞬间真状态 musicActive=" + active
+                    + "（软状态 soft=" + PlayerBridge.isSoftPlaying()
+                    + "/fresh=" + fresh + "）⇒ 立即暂停音乐让路收音: "
+                    + (ok ? "sent" : "FAIL"));
+            return;
+        }
         deferMusicActive = active;
         pending = true;
         fired = false;
         deferPending = true;
         Log.i(TAG, "onWakeup: yield armed musicActive=" + active
                 + " soft=" + PlayerBridge.isSoftPlaying()
-                + " fresh=" + PlayerBridge.isSoftPlayingFresh());
+                + " fresh=" + fresh);
         SessionLog.i("music wakeup-yield armed: 唤醒瞬间真状态 musicActive=" + active
                 + "（软状态 soft=" + PlayerBridge.isSoftPlaying()
-                + "/fresh=" + PlayerBridge.isSoftPlayingFresh()
-                + "）⇒ 音乐继续播，等小智开口第一帧才停");
+                + "/fresh=" + fresh
+                + "）⇒ 音乐未在播，挂起待命");
     }
 
     /**
@@ -379,6 +398,19 @@ public final class MusicResume {
             cancelDefer();
             SessionLog.i("music deferPause skip: 说话暂停开关关着 ⇒ 唤醒不让路"
                     + "（音乐继续播，小智声音叠在上面）");
+            return;
+        }
+        if (pausedOnWakeup) {
+            Log.i(TAG, "deferPause: 已在唤醒瞬间立即暂停，保留待恢复账本");
+            return;
+        }
+        if (trusted) {
+            cancelDefer();
+            boolean ok = PlayerBridge.pauseMusic();
+            pausedOnWakeup = true;
+            markPaused("wakeup", ok);
+            SessionLog.i("music deferPause: trusted=true ⇒ 立即暂停音乐让路收音: "
+                    + (ok ? "sent" : "FAIL"));
             return;
         }
         // v1.3.143：已经由 onWakeup() 挂起了（原厂 handler 是**之后**才走的）⇒
@@ -456,6 +488,11 @@ public final class MusicResume {
             if (wakeupYield) {
                 SessionLog.i("music onTtsAudioStart: 说话暂停开关关着 ⇒ 唤醒轮也不让路");
             }
+            return;
+        }
+        if (pausedOnWakeup) {
+            pausedOnWakeup = false;
+            SessionLog.i("music onTtsAudioStart: 唤醒瞬间已暂停音乐，保持待恢复");
             return;
         }
         // v1.3.143：判据改用 fresh（本进程内真播过），**不认**重启恢复的过期 softPlaying ——
@@ -579,6 +616,7 @@ public final class MusicResume {
      */
     public static void markStopped() {
         pending = false;
+        pausedOnWakeup = false;
         cancel();
         cancelDefer();
         Log.i(TAG, "markStopped: 音乐被停止，不恢复");
@@ -592,6 +630,7 @@ public final class MusicResume {
     public static void markResumed() {
         pending = false;
         fired = false;
+        pausedOnWakeup = false;
         cancel();
         cancelDefer();
         Log.i(TAG, "markResumed: 原厂已自行恢复");
@@ -604,6 +643,7 @@ public final class MusicResume {
     public static void noteUserPause() {
         userPaused = true;
         pending = false;
+        pausedOnWakeup = false;
         cancel();
         cancelDefer();
         Log.i(TAG, "noteUserPause: 用户显式暂停/停止 ⇒ 不自动恢复");
@@ -615,6 +655,7 @@ public final class MusicResume {
         userPaused = false;
         pending = false;
         fired = false;
+        pausedOnWakeup = false;
         cancel();
         cancelDefer();
         SessionLog.i("music noteUserPlay (用户要放新内容 ⇒ 清掉暂停标记)");
@@ -653,6 +694,11 @@ public final class MusicResume {
                     + "（等小智真正回答那一刻才让路），不恢复");
             return;
         }
+        if (pausedOnWakeup && !serverTtsSeen && !"session-end".equals(why)) {
+            SessionLog.i("music onTurnEnded(" + why + "): 唤醒已暂停音乐，等待用户说完/服务器回答");
+            return;
+        }
+        pausedOnWakeup = false;
         // v1.3.133/134：一轮结束 ⇒ 唤醒那次挂起的让路作废（音乐压根不用停）。
         // 例如唤醒后啥也没说、会话超时收尾，音乐会一直播下去。
         // 从没暂停过就不该恢复 —— 否则会给一直在播的音乐补一条空转的 play。

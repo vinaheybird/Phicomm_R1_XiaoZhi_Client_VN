@@ -714,18 +714,18 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
                  oninput="ttsVolLive(this.value)">
         </div>
       </div>
-      <div class="ttl" style="margin-top:10px">Độ nhạy đánh thức <span class="hint" id="lbWakeThr">-13.5 (Khuyên dùng VN)</span></div>
+      <div class="ttl" style="margin-top:10px">Độ nhạy đánh thức <span class="hint" id="lbWakeThr">-13.5 (Chuẩn VN)</span></div>
       <div class="seg" id="segWakeThr">
-        <div data-v="-11.3" onclick="wakeThrPick(-11.3)">Gốc</div>
-        <div data-v="-12.5" onclick="wakeThrPick(-12.5)">Vừa</div>
-        <div data-v="-13.5" onclick="wakeThrPick(-13.5)">VN</div>
-        <div data-v="-15" onclick="wakeThrPick(-15)">Rất nhạy</div>
+        <div data-v="-13.5" onclick="wakeThrPick(-13.5)">Chuẩn</div>
+        <div data-v="-17" onclick="wakeThrPick(-17)">Nhạy</div>
+        <div data-v="-20" onclick="wakeThrPick(-20)">Rất nhạy</div>
+        <div data-v="-22.5" onclick="wakeThrPick(-22.5)">Siêu nhạy</div>
       </div>
       <div class="row" style="margin-top:8px">
         <div><div class="lb">Tinh chỉnh ngưỡng (Chặt ⇄ Nhạy)</div>
-          <div class="ds">Áp dụng ngay không cần khởi động lại loa. Kéo sang phải dễ gọi «Tiểu Trí Tiểu Trí» hơn (quá nhạy dễ nhận nhầm từ TV/nhạc)</div></div>
+          <div class="ds">Áp dụng ngay không cần khởi động lại loa. Hỗ trợ biến thể phát âm tiếng Việt &amp; tự bù nhạy thêm (-1.5..-3.5) khi mở nhạc</div></div>
         <div style="width:140px;flex:none">
-          <input type="range" id="rgWakeThr" min="9" max="17" step="0.5" value="13.5"
+          <input type="range" id="rgWakeThr" min="9" max="26" step="0.5" value="13.5"
                  oninput="wakeThrLive(this.value)">
         </div>
       </div>
@@ -754,7 +754,7 @@ body.embed .wrap{max-width:none;padding:0 8px 8px}
         <button class="btn sm" onclick="saveIdleSec()">Áp dụng</button>
       </div>
       <div class="row">
-        <div><div class="lb">Tạm dừng nhạc khi AI nói</div><div class="ds">XiaoZhi nói sẽ tạm dừng nhạc; nói xong 2.5s mới phát tiếp</div></div>
+        <div><div class="lb">Tạm dừng nhạc khi AI nói</div><div class="ds">Vừa gọi đánh thức sẽ tạm dừng nhạc ngay để thu rõ lệnh; nói xong 2.5s tự phát tiếp</div></div>
         <div class="sw" id="swMp" onclick="tg('swMp','musicPause')"></div>
       </div>
       <div class="row">
@@ -4841,21 +4841,21 @@ function ttsVolLive(val) {
   }, 180);
 }
 
-/* VN fork: Độ nhạy đánh thức (-9.0 chặt .. -17.0 rất nhạy; slider đảo chiều 9..17 để kéo phải = nhạy hơn) */
+/* VN fork: Độ nhạy đánh thức (-9.0 chặt .. -26.0 siêu nhạy; slider đảo chiều 9..26 để kéo phải = nhạy hơn) */
 var WAKE_UI = false, WAKE_T = null;
 function wakeThrLabel(thr) {
   var v = Math.round(thr * 10) / 10;
   var tag = (v >= -10.5) ? "Chặt"
-    : (v >= -11.8) ? "Gốc"
-    : (v >= -13.0) ? "Vừa"
-    : (v >= -14.2) ? "Khuyên dùng VN"
-    : (v >= -15.5) ? "Rất nhạy" : "Cực nhạy";
+    : (v >= -12.0) ? "Gốc"
+    : (v >= -14.5) ? "Chuẩn VN"
+    : (v >= -18.0) ? "Nhạy"
+    : (v >= -21.0) ? "Rất nhạy" : "Siêu nhạy (Xa/Nhạc)";
   return v.toFixed(1) + " (" + tag + ")";
 }
 function paintWakeThr(thr) {
   var v = Math.round(thr * 10) / 10;
   if (v > -9) v = -9;
-  if (v < -17) v = -17;
+  if (v < -26) v = -26;
   var lb = $("lbWakeThr");
   if (lb) lb.textContent = wakeThrLabel(v);
   var rg = $("rgWakeThr");
@@ -4872,7 +4872,7 @@ function paintWakeThr(thr) {
 function sendWakeThr(thr) {
   var v = Math.round(thr * 10) / 10;
   if (v > -9) v = -9;
-  if (v < -17) v = -17;
+  if (v < -26) v = -26;
   WAKE_UI = true;
   paintWakeThr(v);
   if (WAKE_T) clearTimeout(WAKE_T);

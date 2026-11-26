@@ -122,8 +122,8 @@
 
     sget-object v1, Lcom/unisound/vui/engine/ANTEngineOption;->WAKEUP_OPT_THRESHOLD_VALUE:Lcom/unisound/vui/engine/ANTEngineOption;
 
-    # VN fork: unlock native KWS floor to -18.0f so live Web Console wakeup threshold works immediately across -9.0..-17.0
-    const v2, -0x3e700000    # -18.0f
+    # VN fork: unlock native KWS floor to -30.0f so far-field + VN pronunciation candidates always reach NLUDispatcher
+    const v2, -0x3e100000    # -30.0f
 
     invoke-static {v2}, Ljava/lang/Float;->valueOf(F)Ljava/lang/Float;
 

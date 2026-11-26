@@ -1,6 +1,7 @@
 package cn.workbuddy.r1client;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -44,10 +45,10 @@ public final class VoicePower {
     /** files/ 下的持久化旗标：存在 ⇒ 省电模式（语音助手停用） */
     public static final String FLAG = "voice_off";
 
-    /** VN fork: persisted wakeup threshold (files/wake_thr, -17.0..-9.0, default -13.5). */
+    /** VN fork: persisted wakeup threshold (files/wake_thr, -26.0..-9.0, default -13.5). */
     public static final String WAKE_THR_FILE = "wake_thr";
     public static final float WAKE_THR_DEFAULT = -13.5f;
-    public static final float WAKE_THR_MIN = -17.0f;
+    public static final float WAKE_THR_MIN = -26.0f;
     public static final float WAKE_THR_MAX = -9.0f;
 
     private static volatile Context ctx;
@@ -109,9 +110,27 @@ public final class VoicePower {
     /** Apply sWakeThr to ANTConfigPreference static fields (+ native engine option if available). */
     public static void applyWakeThr(String why) {
         float thr = sWakeThr;
-        float m1 = Math.max(-18.0f, Math.round((thr - 0.5f) * 10.0f) / 10.0f);
-        float m2 = Math.max(-18.0f, Math.round((thr - 1.0f) * 10.0f) / 10.0f);
-        float m3 = Math.max(-18.0f, Math.round((thr - 2.0f) * 10.0f) / 10.0f);
+        float m1 = Math.max(-28.5f, Math.round((thr - 1.5f) * 10.0f) / 10.0f);
+        float m2 = Math.max(-28.5f, Math.round((thr - 2.5f) * 10.0f) / 10.0f);
+        float m3 = Math.max(-28.5f, Math.round((thr - 3.5f) * 10.0f) / 10.0f);
+        float eff = thr;
+        try {
+            boolean musicPlaying = PlayerBridge.isMusicActive() || PlayerBridge.isSoftPlayingFresh();
+            if (musicPlaying && ctx != null) {
+                AudioManager am = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
+                int vol = (am != null) ? am.getStreamVolume(AudioManager.STREAM_MUSIC) : 4;
+                if (vol >= 12) {
+                    eff = m3;
+                } else if (vol >= 10) {
+                    eff = m2;
+                } else if (vol >= 1) {
+                    eff = m1;
+                }
+            } else if (musicPlaying) {
+                eff = m1;
+            }
+        } catch (Throwable ignored) {
+        }
         try {
             Class<?> cls = Class.forName("com.unisound.vui.common.config.ANTConfigPreference");
             setStaticFloat(cls, "wakeupBenchmark", thr);
@@ -119,13 +138,13 @@ public final class VoicePower {
             setStaticFloat(cls, "wakeupBenchmarkForMusicPlaying", m1);
             setStaticFloat(cls, "wakeupBenchmarkForMusicPlayingTwo", m2);
             setStaticFloat(cls, "wakeupBenchmarkForMusicPlayingThree", m3);
-            setStaticFloat(cls, "effectWakeupBenchmark", thr);
-            Log.i(TAG, "VoicePower.applyWakeThr(" + why + "): thr=" + thr
+            setStaticFloat(cls, "effectWakeupBenchmark", eff);
+            Log.i(TAG, "VoicePower.applyWakeThr(" + why + "): thr=" + thr + " eff=" + eff
                     + " music=[" + m1 + "," + m2 + "," + m3 + "]");
         } catch (Throwable t) {
             Log.w(TAG, "VoicePower.applyWakeThr(" + why + ") failed: " + t);
         }
-        // Also ensure native engine option WAKEUP_OPT_THRESHOLD_VALUE (0xc4e) stays <= -18.0f
+        // Ensure native engine option WAKEUP_OPT_THRESHOLD_VALUE (0xc4e) stays <= -30.0f
         Object e = sEngine;
         if (e != null) {
             try {
@@ -133,7 +152,7 @@ public final class VoicePower {
                 Object u = mUnsafe.invoke(e);
                 if (u != null) {
                     Method mOpt = u.getClass().getMethod("setASROption", int.class, Object.class);
-                    mOpt.invoke(u, Integer.valueOf(0xc4e), Float.valueOf(-18.0f));
+                    mOpt.invoke(u, Integer.valueOf(0xc4e), Float.valueOf(-30.0f));
                 }
             } catch (Throwable ignored) {
             }

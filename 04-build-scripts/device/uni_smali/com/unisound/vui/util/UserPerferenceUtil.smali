@@ -564,15 +564,25 @@
     .end annotation
 
     .prologue
-    # jp2 v1.3.71: factory wakeup word hard-wired to "小智小智".
-    #   was: R.array.default_wakeup_words (小讯小讯/交接手续) / SP main_wakeup_word.
-    #   cannot patch resources.arsc: it is inside the v1 signature, and Janus
-    #   replacement depends on that signature staying valid.
+    # jp2 v1.3.71 + VN fork: factory wakeup words ("小智小智" + VN phonetic variants:
+    #   小知小知 xiǎo zhī, 小记小记 xiǎo jì = "siao chi", 小字小字 xiǎo zì = "siao zi/di").
     new-instance v1, Ljava/util/ArrayList;
 
     invoke-direct {v1}, Ljava/util/ArrayList;-><init>()V
 
     const-string v0, "\u5c0f\u667a\u5c0f\u667a"
+
+    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    const-string v0, "\u5c0f\u77e5\u5c0f\u77e5"
+
+    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    const-string v0, "\u5c0f\u8bb0\u5c0f\u8bb0"
+
+    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    const-string v0, "\u5c0f\u5b57\u5c0f\u5b57"
 
     invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
@@ -894,15 +904,25 @@
     .end annotation
 
     .prologue
-    # jp2 v1.3.71: factory wakeup word hard-wired to "小智小智".
-    #   was: R.array.default_wakeup_words (小讯小讯/交接手续) / SP main_wakeup_word.
-    #   cannot patch resources.arsc: it is inside the v1 signature, and Janus
-    #   replacement depends on that signature staying valid.
+    # jp2 v1.3.71 + VN fork: factory wakeup words ("小智小智" + VN phonetic variants:
+    #   小知小知 xiǎo zhī, 小记小记 xiǎo jì = "siao chi", 小字小字 xiǎo zì = "siao zi/di").
     new-instance v1, Ljava/util/ArrayList;
 
     invoke-direct {v1}, Ljava/util/ArrayList;-><init>()V
 
     const-string v0, "\u5c0f\u667a\u5c0f\u667a"
+
+    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    const-string v0, "\u5c0f\u77e5\u5c0f\u77e5"
+
+    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    const-string v0, "\u5c0f\u8bb0\u5c0f\u8bb0"
+
+    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    const-string v0, "\u5c0f\u5b57\u5c0f\u5b57"
 
     invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 

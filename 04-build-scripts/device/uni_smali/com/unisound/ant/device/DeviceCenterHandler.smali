@@ -321,7 +321,7 @@
     invoke-static {v1, v2}, Lcom/unisound/vui/util/LogMgr;->d(Ljava/lang/String;Ljava/lang/String;)V
 
     .line 529
-    const/16 v1, 0x8
+    const/16 v1, 0x1
 
     if-ge v0, v1, :cond_29
 

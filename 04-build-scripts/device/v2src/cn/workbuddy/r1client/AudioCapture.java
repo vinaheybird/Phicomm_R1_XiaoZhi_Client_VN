@@ -400,8 +400,9 @@ public final class AudioCapture {
         telemStartMs = SystemClock.elapsedRealtime();
         lastTelemLogMs = 0;
         lastSigLogMs = 0;
-        alcGain = 1.0;   // v1.3.104：每轮会话从单位增益重新收敛
-        alcLast = 1.0;
+        alcGain = 5.0;   // VN fork: start from 5x so far-field first syllable isn't attenuated
+        alcLast = 5.0;
+        alcSpeechRun = 0;
     }
 
     /** 每产出 1 帧调一次（60ms / 960 样本，开销可忽略） */
@@ -1227,8 +1228,9 @@ public final class AudioCapture {
      * 这样不会把底噪一路放大成嘶嘶声。
      */
     public static volatile boolean alcEnabled = false;
-    private double alcGain = 1.0;
-    private volatile double alcLast = 1.0;   // micTelem 展示用
+    private double alcGain = 5.0;
+    private volatile double alcLast = 5.0;   // micTelem 展示用
+    private int alcSpeechRun = 0;            // 连续达标人声帧数（过滤单帧环境杂音脉冲）
 
     /** v1.3.121：最近一帧下混后、施加 ALC/固定增益**之前**的 RMS（实时打断用）。 */
     private volatile int lastRawRms = 0;
@@ -1246,12 +1248,15 @@ public final class AudioCapture {
         }
         return (int) Math.sqrt((double) sumsq / FRAME_SAMPLES);
     }
-    private static final double ALC_TARGET_RMS = 1400.0;  // 目标上行 RMS（16bit）
-    private static final double ALC_MIN_RMS = 45.0;       // 低于此视作静音，冻结增益
-    private static final double ALC_MAX_GAIN = 10.0;
+    private static final double ALC_TARGET_RMS = 1500.0;  // 目标上行 RMS（16bit）
+    private static final double ALC_SPEECH_RMS = 38.0;    // 远场人声门限（环境底噪 7..15，偶发脉冲 20..37）
+    private static final double ALC_SILENCE_RMS = 24.0;   // 真静音门限：缓慢回落至基线，让服务端 VAD 正常判停
+    private static final double ALC_BASE_GAIN = 4.0;      // 静音回落基线（与 VN 默认 gain=4 对齐）
+    private static final double ALC_MAX_GAIN = 12.0;      // 远场最大 12x 放大（防底噪拉成持续人声）
     private static final double ALC_MIN_GAIN = 0.2;
-    private static final double ALC_ATTACK = 0.30;        // 每 60ms 帧向目标追的比例
-    private static final double ALC_RELEASE = 0.02;
+    private static final double ALC_ATTACK = 0.40;        // 每 60ms 帧向目标追的比例
+    private static final double ALC_RELEASE = 0.04;
+    private static final double ALC_SILENCE_DECAY = 0.12; // 静音期每帧向 4x 回落比例（~0.5s 干净收尾）
     private static final double ALC_KNEE = 22000.0;       // 软膝起点
     private static final double ALC_CEIL = 30000.0;       // 软限幅上限
 
@@ -1262,16 +1267,24 @@ public final class AudioCapture {
             sumsq += (long) v * v;
         }
         double rms = Math.sqrt((double) sumsq / FRAME_SAMPLES);
-        if (rms > ALC_MIN_RMS) {
-            double want = ALC_TARGET_RMS / rms;
-            if (want > ALC_MAX_GAIN) {
-                want = ALC_MAX_GAIN;
-            } else if (want < ALC_MIN_GAIN) {
-                want = ALC_MIN_GAIN;
+        if (rms >= ALC_SPEECH_RMS) {
+            alcSpeechRun++;
+            if (alcSpeechRun >= 2 || rms >= 60.0) {
+                double want = ALC_TARGET_RMS / rms;
+                if (want > ALC_MAX_GAIN) {
+                    want = ALC_MAX_GAIN;
+                } else if (want < ALC_MIN_GAIN) {
+                    want = ALC_MIN_GAIN;
+                }
+                // 抬得要快（用户开口的头几个字别被压掉），落得要慢（别把尾音咬成 pumps）
+                double k = (want > alcGain) ? ALC_ATTACK : ALC_RELEASE;
+                alcGain += (want - alcGain) * k;
             }
-            // 抬得要快（用户开口的头几个字别被压掉），落得要慢（别把尾音咬成 pumps）
-            double k = (want > alcGain) ? ALC_ATTACK : ALC_RELEASE;
-            alcGain += (want - alcGain) * k;
+        } else {
+            alcSpeechRun = 0;
+            if (rms < ALC_SILENCE_RMS && alcGain > ALC_BASE_GAIN) {
+                alcGain += (ALC_BASE_GAIN - alcGain) * ALC_SILENCE_DECAY;
+            }
         }
         final double g = alcGain;
         alcLast = g;
